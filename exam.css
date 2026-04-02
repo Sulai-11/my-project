@@ -1,0 +1,465 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,100..900&display=swap');
+
+*{
+margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+     font-family: "Cairo", sans-serif;
+  font-optical-sizing: auto;
+}
+html {
+    scroll-behavior: smooth;
+}
+body{
+    font-family: "Rubik", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    background-color: #efeeee;
+}
+.header {
+    position: fixed;
+    width: 100%;
+    height: 11%;
+    display: flex;
+    flex-wrap: nowrap;
+    margin: 0;
+    align-items: center;
+    /* background-color: #1560c2; */
+    background-color: #368bdf;
+    
+    z-index: 2;
+    
+}
+
+.head-div{
+    display: flex;
+    
+    align-items: center;
+    justify-content:center ;
+    width: 10%;
+    
+}
+.header-btns{
+    width: 70%;
+    display: flex;
+   height: 100%;
+    align-items: center;
+   margin: 0;
+   padding: 0;
+}
+.div-signin{
+    
+    display: flex;
+    align-items: center;
+    direction: ltr;
+    text-decoration: none;
+    width: 20%;
+    
+}
+.btn5 {
+    
+   width: 100%;
+   
+    min-height: 6vh;
+    height:auto;
+    border-radius: 15px;
+    font-size: 16px;
+    cursor: pointer;
+    /* border: none; */
+    border: 2px solid #eef5ff;
+    margin: 0 0 0 30px;
+    color: #368bdf;
+    background-color: #ffffff;
+    transition: 0.2s;
+}
+
+.btn5:hover {
+    color: white;
+    background-color: #368bdf;
+    /* 0c4187 */
+    transition: 0.2s;
+}
+.btn2{
+    /* width: auto;
+    padding:30px 20px;
+    height: auto; */
+    padding: 27px 30px 10px;
+    
+    margin: 0;
+    
+    font-weight: 500;
+    font-size: 1rem;
+    cursor: pointer;
+    border: none;
+    /* color: #2e3ea5; */
+    color: #ffffff;
+    background-color: #368bdf;
+    border-radius: 0 0 25px 25px;
+}
+
+.btn2:hover{
+    background-color: #3280cf;
+    color: #ffffff;
+    
+}
+.btn2:focus{
+    color: #1560c2;
+    background-color: #efeeee;
+}
+.a1{
+    font-size: 18px;
+    text-decoration: none;
+    color: #767a91;
+    height: 100%;
+    
+    
+}
+
+.a1:hover{
+    color: #2e3ea5;
+}
+.div-exam{
+    
+    background-color: #fefefe;
+    padding: 20px 0 40px 0;
+    margin: auto auto 30px;
+    width: 60%;
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    
+}
+
+.btn-ch{
+
+    display: flex;
+    flex-direction: row-reverse;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    background-color: inherit;
+    border: none;
+    align-items: center;
+    text-align: center;
+    text-decoration: none;
+    
+
+}
+.btn-ch .Q-text{
+    color: black;
+    font-size: 15px;
+    background-color: #ececec;
+    width: 90%;
+    text-align: left;
+    padding: 7px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.form-q{
+    display: flex;
+    margin: auto;
+    flex-direction: column;
+    gap: 5px;
+    width: 70%;
+    overflow: hidden;
+}
+
+.btn-ch .Q-text:hover{
+    background-color: #dddddd;
+}
+
+.btn-ch .check{
+    appearance:none;
+    width: 15px;
+    height: 15px;
+    border: 0.5px solid #b8b8b8;
+    border-radius: 50%;
+    transition: all 0.09s ease;
+    margin: 0 10px 0 0;
+    cursor: pointer;
+    
+}
+.check:checked{
+  transition: all 0.09s ease;
+  background:#46a0ff;
+  border-color:#46a0ff;
+}
+.exam-hr{
+    width: 80%;
+    margin: 35px auto 35px;
+    border: 1px solid #cfcfcf;
+}
+.div-quist{
+    width: 80%;
+    display: flex;
+    flex-direction: row-reverse;
+    margin: auto;
+    align-items: center;
+    padding-top: 15px;
+    
+}
+.p-quist{
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: inherit;
+    border: 3px solid #3e9eff;
+    width: 40px;
+    /* padding: 20px 0 20px; */
+    height: 40px;
+    border-radius: 50%;
+    
+}
+.p-quist2{
+width: 80%;
+font-weight: 600;
+display: flex;
+direction: ltr;
+margin-left: 15px;
+}
+.degree-quist{
+    border: 2px solid #c8e6ff;
+    background-color: #f3fbff;
+    padding: 5px 26px;
+    border-radius: 50px;
+}
+.div-examall{
+    height: auto;
+    background-color: #edf6ff;
+    position: relative;
+    
+    padding-top:50px ;
+    
+}
+.valid-exam{
+    position: sticky;
+    top: 00px;
+    width: 60%;
+    background-color: #ffffff;
+    margin: 0 auto 30px;
+    height: 90px;
+    border-radius: 50px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.105);
+    display: flex;
+    gap: 5px;
+}
+.valid-exam a{
+    width: 45px;
+    height: 50px;
+    position: relative;
+    font-size: 1rem;
+    text-decoration: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    left: 5%;
+    top: 20px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    background-color: #e9e9e9;
+    color: black;
+    font-weight: 400;
+}
+.valid-exam a:hover{
+    background-color: #dbdada;
+}
+ .valid-exam a.answered {
+    background-color: #b8e2c6 !important; 
+}
+
+.exam-name{
+    display: flex;
+    justify-content: center;
+    background-color: #3e9eff;
+    color: #edf6ff;;
+    width: 10%;
+    font-size: 20px;
+    position: relative;
+    right: 100px;
+    border-radius: 25px;
+    font-weight: 600;
+}
+.exam-no{
+    display: flex;
+    justify-content: center;
+    
+    color: #3893ed;
+    width: 30%;
+    
+    margin: auto auto 20px auto;
+    font-size: 32px;
+    font-weight: 500;
+    text-shadow: 0 0 15px rgba(0, 0, 0, 0.195);
+}
+.exam-done{
+    width: 25%;
+    height: 90px;
+    margin: 5% auto 0 ;
+    background-color: #ffffff;
+    border-radius: 50px 50px 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    direction: ltr;
+    box-shadow: 0 0px 15px hsla(0, 0%, 0%, 0.126);
+}
+.back-exam{
+width: 50%;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+.back-exam button{
+    font-size: 19px;
+    font-weight: 400;
+    width: 70%;
+    height: 50px;
+    border-radius: 25px;
+    border: none;
+    background-color: #ffd6d6;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-decoration: none;
+    color: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.back-exam button:hover{
+    transition: all 0.3s ease;
+    background-color: #ffc2c2;
+}
+.back-exam a{
+    font-size: 19px;
+    font-weight: 400;
+    width: 70%;
+    height: 50px;
+    border-radius: 25px;
+    border: none;
+    background-color: #ffd6d6;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-decoration: none;
+    color: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.back-exam a:hover{
+    transition: all 0.3s ease;
+    background-color: #ffc2c2;
+}
+
+
+.submit-exam{
+width: 50%;
+display: flex;
+align-items: center;
+justify-content: center;
+
+
+}
+.submit-exam button{
+    font-size: 19px;
+    font-weight: 400;
+    width: 70%;
+    height: 50px;
+    border-radius: 25px;
+    border: none;
+    transition: all 0.3s ease;
+    cursor: pointer;   
+     background-color: #cde4f5;
+
+}
+.submit-exam button:hover{
+    background-color: #c2dcff ;
+    transition: all 0.3s ease;
+}
+.submit-exam a{
+    font-size: 19px;
+    font-weight: 400;
+    width: 70%;
+    height: 50px;
+    border-radius: 25px;
+    border: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-decoration: none;
+    color: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #cde4f5;
+
+}
+.submit-exam a:hover{
+    background-color: #c2dcff ;
+    transition: all 0.3s ease;
+}
+
+.sidebar {
+    height: 100%; 
+    width: 250px; 
+    position: fixed; 
+    z-index: 100; 
+    top: 0;
+    left: -300px; 
+    
+    background-color: #ffffff; 
+    overflow-x: hidden; 
+    
+
+    transition: 0.3s ease; 
+    box-shadow: 0 1px 1px black;
+}
+
+
+
+.sidebar.open {
+    left: 0; 
+}
+
+.sidebar .a-side:hover {
+    background-color: #e8e8e8;
+}
+.sidebar .a-side{
+    padding: 15px 20px;
+    
+    text-decoration: none;
+    font-size: 20px;
+    color: #368bdf;
+    display: block; 
+    transition: 0.2s;
+    font-weight: 500;
+}
+
+.sidebar .close-btn {
+    
+    text-decoration: none;
+    font-size: 20px;
+    color: #368bdf;
+    display: block; 
+    transition: 0.2s;
+    position: absolute;
+    top: 0;
+    left: 10px; 
+    font-size: 36px;
+}
+
+
+.open-sidebar-btn {
+    font-size: 25px;
+    cursor: pointer;
+    background-color: #ffffff; 
+    color: #368bdf;
+    padding: 3px 15px;
+    border: none;
+    border-radius: 50%;
+    box-shadow: 0px 0px 3px  rgba(0, 0, 0, 0.279);
+    position: fixed;
+    top: 50px;
+    left: 20px;
+    z-index: 50; 
+}

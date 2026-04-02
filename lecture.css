@@ -1,0 +1,115 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,100..900&display=swap');
+@import url('https://cdn-uicons.flaticon.com/3.0.0/uicons-regular-rounded/css/uicons-regular-rounded.css');
+@import url('https://cdn-uicons.flaticon.com/3.0.0/uicons-solid-rounded/css/uicons-solid-rounded.css');
+@import url('https://cdn-uicons.flaticon.com/3.0.0/uicons-solid-straight/css/uicons-solid-straight.css');
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+     font-family: "Cairo", sans-serif;
+  font-optical-sizing: auto;
+}
+header{
+    color: #ffffff;
+    background-color: #0d82ff;
+    width: 30%;
+    height: 120px;
+    margin: 0 auto;
+    border-radius: 0 0 25px 25px;
+}
+header img{
+    width: 90px;
+    position: absolute;
+    top: 10px;
+    right: 48%;
+}
+header p{
+    font-size: 20px;
+    font-weight: 500;
+    position: absolute;
+    top: 70px;
+    right: 47.5%;
+}
+body{
+    background-color: #f0faff;
+}
+.main h1{
+    display: flex;
+    justify-content: center;
+    margin: 50px auto 20px auto;
+    font-size: 40px;
+    width: 40%;
+    color: #0d82ff;
+}
+.video{
+    height: 500px;
+    width: 100%;
+    border: 1px solid black;
+    margin: auto;
+    
+}
+.div-video{
+    width: 80%;
+    max-width: 1100px;
+    margin: auto;
+}
+
+.main h2{
+    font-size: 40px;
+    width: 75%;
+    color: #0d82ff;
+    margin: 25px auto 4px auto;
+
+}
+
+.main p{
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 50px;
+    width: 80%;
+    margin: 0 auto 100px auto;
+}
+
+.next{
+    width: 210px;
+    margin: 50px auto 50px auto;
+    display: flex;
+    justify-content: space-between;
+    
+}
+
+.next button:not(.back){
+    width: 100px;
+    height: 50px;
+    font-size: 19px;
+    font-weight: 500;
+    border-radius: 0 25px 25px 0;
+    border: none;
+    background-color: #54a7ff;
+    color: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.next button:not(.back):hover{
+    background: #0d82ff;
+    color: #ffffff;
+}
+.next .back{
+    width: 100px;
+    height: 50px;
+    font-size: 19px;
+    font-weight: 500;
+    
+    border-radius: 25px 0 0 25px;
+    border: none;
+    background-color: #54a7ff;
+    color: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.next .back:hover{
+    background: #0d82ff;
+    color: #ffffff;
+}
