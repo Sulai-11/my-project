@@ -15,9 +15,10 @@
 
     <p class="login-p">التسجيل</p>
 
-    <input name="username" type="text" class="email" placeholder="اسم المستخدم" required>
+    <input name="first_name" type="text" class="email" placeholder="الاسم الأول" required>
+    <input name="last_name" type="text" class="email" placeholder="اسم العائلة" required>
     <input name="email" type="email" class="email" placeholder="البريد الالكتروني" required>
-    <input name="pass" type="password" class="email" placeholder="كلمة السر" required>
+    <input name="password" type="password" class="email" placeholder="كلمة السر" required>
 
     <input type="submit" class="login-btn" value="تسجيل">
 </form>
@@ -28,10 +29,19 @@
     <p class="login-p">تسجيل الدخول</p>
 
     <input name="email" type="email" class="email" placeholder="البريد الالكتروني" required>
-    <input name="pass" type="password" class="email" placeholder="كلمة السر" required>
+    <input name="password" type="password" class="email" placeholder="كلمة السر" required>
 
-    <input type="submit" class="login-btn" value="تسجيل الدخول">
-  </form>
+    <!-- زر دخول كطالب -->
+    <button type="submit" name="login_type" value="student" class="login-btn">
+        تسجيل الدخول كطالب
+    </button>
+
+    <!-- زر دخول كمعلم -->
+    <button type="submit" name="login_type" value="teacher" class="login-btn teacher" style="margin-top:10px;">
+        تسجيل الدخول كمعلم
+    </button>
+
+</form>
 
   <div class="blue-div" id="myBlueDiv">
     <a href="second.php" target="_self"><button class="blue-out"><img src="html images/exit.png"></button></a>

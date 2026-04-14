@@ -9,6 +9,11 @@ margin: 0;
      font-family: "Cairo", sans-serif;
   font-optical-sizing: auto;
 }
+html, body {
+    overflow-x: hidden;
+    width: 100%;
+}
+
 .header {
     position: absolute;
     left: 36%;
@@ -18,9 +23,7 @@ margin: 0;
     flex-wrap: nowrap;
     margin: 0;
     align-items: center;
-    justify-content: center;
-    /* background-color: #1560c2; */
-    
+    justify-content: center;    
     z-index: 2;
     border-radius: 0 0 25px 25px;
 }
@@ -183,13 +186,7 @@ align-items: center;
   color: #ffffff;
   
 }
-.home-side.sidebar-open .user-iconn{
-    
-}
 
-.side-div{
-
-}
 .side-p,
 .side-user-p{
     opacity: 0;
@@ -247,9 +244,10 @@ display: flex;
 justify-content: space-between;
 width: 55%;
 align-items: center;
-margin: 0 auto;
+margin: 0 auto 12px;
+margin-top: auto;
 position: relative;
-top: 50%;
+
 transition: width 0.4s ease-out;
 }
 .home-side.sidebar-open .btns-wrapper,
@@ -279,11 +277,16 @@ color: #ffffff;
 font-size: 50px;
 }
 .class-title p{
-position: absolute;
-right: 70px;
-top: 330px;
-color: #ffffff;
-font-size: 20px;
+    position: absolute;
+    right: 70px;
+    top: 330px;
+    color: #ffffff;
+    font-size: 20px;
+    width: 50%;
+    
+    line-height: 1.8;
+    white-space: normal;
+    word-wrap: break-word;
 }
 .class-title a{
 position: absolute;
@@ -306,8 +309,8 @@ transition: background-color .3s ease-in-out;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.304);
     z-index: 50;
     position: absolute;
-    height: fit-content;
-    width: 530px;
+    height: 1300px;
+    width: 550px;
     background-color: rgb(255, 255, 255);
     top: 240px;
     left: 8%;
@@ -322,6 +325,7 @@ transition: background-color .3s ease-in-out;
     object-fit: cover;
     padding: 0;
     margin: 0;
+    height: 350px;
 }
 .class .class-div{
     display: flex;
@@ -330,18 +334,17 @@ transition: background-color .3s ease-in-out;
 .class-logo{
     position: relative;
     top: 35px;
-    right: 4%;
-    width: 7%;
-    height: 35px;
-   /* icons color: 292929 */
-    
+    right: 30px;
+    width: 40px;
+    height: 35px;    
 }
 .class h3{
     position: relative;
     top: 35px;
-    right: 6%;
-    width: 20%;
+    right: 40px;
+    width: 120px;
     
+    white-space: nowrap;
 }
 .class p{
     position: relative;
@@ -355,8 +358,8 @@ transition: background-color .3s ease-in-out;
 .class hr{
     border: solid .5px rgba(0, 0, 0, 0.1);
     position: relative;
-    left: 30px;
-    width: 90%;
+    
+    width: 550px;
 }
 .class-grad{
     position: relative;
@@ -375,15 +378,16 @@ transition: background-color .3s ease-in-out;
 .class-topic{
     display: flex;
    height: 200px;
+   width: 690px;
 }
 .class-topic div{
     position: relative;
-    top: 100px;
-    left: 95px;
+    top: 110px;
+    left: 21.5%;
     display: flex;
     height: 50px;
-    gap: 50px;
-    justify-content: space-between;
+    gap: 10px;
+    
 }
 .class-topic a{
     color: #004992;
@@ -392,31 +396,36 @@ transition: background-color .3s ease-in-out;
     font-weight: 500;
     border-radius: 25px;
     background-color: #f2f8ff;
-    width: 130px;
+    width: 170px;
     display: flex;
     justify-content: center;
     align-items: center;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.216);
+   
 }
 .class-topic a:hover{
     text-decoration: underline #004992;
 }
+
 .class-f{
     background-color: #2d6fb2; 
-    height: 300px;
+    
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        width: 550px;
+        height: 320px;
 }
 .class-f img{
     width: 150px;
-    position: relative;
-    right: 185px;
-    top: 80px;
+    
 }
-.class-f p{
-    font-size: 1.5rem;
+.class-f h4{
+    font-size: 28px;
     color: white;
-    position: relative;
-    top: 80px;
-    right: -1px;
+    letter-spacing: 3px;
+
 }
 .bar{
     height: 80px;
@@ -438,31 +447,30 @@ transition: background-color .3s ease-in-out;
 }
 .content{
     background-color: #ebebeb;
-    height: 1300px;
+    height: fit-content;
+     display: flex;
+    flex-direction: column;
+    padding-right: 250px;
+    
 }
 .content ul{
-    position: relative;
-    top: 70px;
-    right: 90px;
     font-size: 1rem;
     font-weight: 450;
+    padding-right: 30px;
+
 }
 .content li{
     margin-bottom: 30px;
 }
 .content h3:not(.h3-2){
-    position: relative;
-    right: 70px;
-    top: 50px;
     font-size: 1.8rem;
     font-weight: 400;
+    margin: 30px 0 20px;
 }
 .content a:not(.a-2){
-position: relative;
-right: 70px;
-top: 16vh;
-text-decoration: none;
 
+text-decoration: none;
+width: fit-content;
 background-color: #2d6fb2;
 padding: 15px 45px;
 border-radius: 5px;
@@ -475,25 +483,20 @@ transition: background-color .3s ease-in-out;
     background-color: #28639e;
 }
 .h3-2{
-    position: relative;
-    right: 70px;
-    top: 20vh;
+    
     font-size: 1.8rem;
     font-weight: 400;
+    margin: 30px 0 20px;
 }
 .content p{
-    position: relative;
-    top: 20vh;
-    right: 70px;
+    
     width: 50%;
     line-height: 5vh;
 }
 .a-2{
-    position: relative;
-right: 70px;
-top: 35vh;
+    margin: 30px 0 100px;
 text-decoration: none;
-
+width: fit-content;
 background-color: #2d6fb2;
 padding: 15px 45px;
 border-radius: 5px;

@@ -48,7 +48,35 @@ margin: 0;
 .user-status:hover #level{
     color: #ffffff;
 }
+.logout-btn {
+  
+  background:  #c9312c7b;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 95px;
+  height: 40px;
+  margin-left: 20px;
+    transition: background-color 0.3s ease;
+}
+.logout-btn:hover {
+    background-color: #c9302c;
+}
 
+.user-name {
+  font-weight: bold;
+}
+
+.user-level {
+    color: #ffffffc7;
+  background: linear-gradient(to left, #1c5bd1a8, #ffffff24) ;
+  padding: 7px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  border: 2px solid #394ab5;
+}
 
 body{
     font-family: "Rubik", sans-serif;
@@ -69,7 +97,7 @@ body{
     align-items: center;
     background-color: #2e77c0;
     
-    z-index: 2;
+    z-index: 9;
     
 }
 
@@ -149,7 +177,7 @@ footer{
     align-items: center;
     direction: ltr;
     text-decoration: none;
-    width: 550px;
+    width: 650px;
     height: 100%;
     
     
@@ -306,8 +334,9 @@ padding-top: 4px;
 }
 .course-a{
     position: absolute;
+    top: 600px;
     left: 50px;
-    width: 6%;
+    width: 100px;
     height: 50px;
     border-radius: 25px;
     cursor: pointer;
@@ -319,6 +348,7 @@ padding-top: 4px;
     background-color: #2e77c0;
     text-decoration: none;
     transition: background-color .1s ease-in-out;
+    z-index: 4;
 }
 .course-a:hover{
     background-color: #296aab;
@@ -651,129 +681,484 @@ color: #276bb5;
     background-color: #114d9b;
 }
 
-.logout-btn {
-  
-  background:  #c9312c7b;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  width: 95px;
-  height: 40px;
-  margin-left: 20px;
-    transition: background-color 0.3s ease;
-}
-.logout-btn:hover {
-    background-color: #c9302c;
-}
 
-.user-name {
-  font-weight: bold;
-}
-
-.user-level {
-  background: #eee;
-  padding: 3px 8px;
-  border-radius: 6px;
-  font-size: 14px;
-}
 
 .modal {
     display: none;
     position: fixed;
-    top: 0;
-    left: 0;
-    
-    width: 100vw;
-    height: 100vh;
-
-    background: rgba(0, 0, 0, 0.6); 
-
-    display: none;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
     justify-content: center;
     align-items: center;
-
-    z-index: 999999; 
+    z-index: 999999;
+    padding: 20px;
 }
 
-
-.modal-box {
-    background: white;
-    padding: 25px;
-    border-radius: 15px;
-    width: 400px;
-    max-width: 90%;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-    
-    position: relative;
-transform: translateY(-20px);
+.modal-course-form {
+    background: #ffffff;
+    width: 900px;
+    max-width: 95vw;
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 22px;
+    padding: 30px 28px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+    transform: translateY(-20px);
     opacity: 0;
     transition: 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
 }
 
-.modal.show .modal-box {
+.modal.show .modal-course-form {
     transform: translateY(0);
     opacity: 1;
 }
-.modal-box h2 {
-    color: #2e77c0;
+
+.modal-course-form h2 {
     text-align: center;
-    margin-bottom: 20px;
+    color: #2e77c0;
+    font-size: 30px;
+    margin-bottom: 25px;
 }
+
+.course-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-size: 15px;
+    font-weight: 700;
+    color: #2b4d73;
+}
+
+.full-width {
+    grid-column: 1 / -1;
+}
+
 .modal-input {
     width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 16px;
+    padding: 13px 14px;
+    border: 1px solid #cfd8e3;
+    border-radius: 12px;
+    font-size: 15px;
+    background: #f9fbfd;
+    transition: 0.2s ease;
 }
+
 .modal-input:focus {
     border-color: #2e77c0;
+    background: #fff;
     outline: none;
+    box-shadow: 0 0 0 3px rgba(46, 119, 192, 0.12);
 }
-.modal-buttons {
-    width: 80%;
+
+.modal-course-form textarea.modal-input {
+    resize: vertical;
+    min-height: 110px;
+}
+
+.modal-course-form input[type="file"].modal-input {
     padding: 10px;
-    
+    background: #fff;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 24px;
+    padding-top: 10px;
+}
+
+.submit-course,
+#closeCourseBtn {
+    min-width: 130px;
+    height: 44px;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.25s ease;
+}
+
+.submit-course {
+    background: #2e77c0;
     color: white;
-    font-size: 16px;
+}
+
+.submit-course:hover {
+    background: #255f9b;
+}
+
+#closeCourseBtn {
+    background: #d9534f;
+    color: white;
+}
+
+#closeCourseBtn:hover {
+    background: #be3f3a;
+}
+
+@media (max-width: 700px) {
+    .course-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-course-form {
+        padding: 22px 18px;
+    }
+
+    .modal-course-form h2 {
+        font-size: 24px;
+    }
+}
+
+
+.specializations-menu-wrapper {
+    position: relative;
+    height: 100%;
+    width: 15%;
+    display: flex;
+    align-items: center;
+}
+
+.specializations-menu-wrapper .btn2 {
+    width: 100%;
+    height: 100%;
+}
+
+.specializations-panel {
+    position: absolute;
+    top: 100%;
+    right: -180px;
+    width: 950px;
+    max-width: 95vw;
+    background: linear-gradient(to left, #2e77c0, #3c8cdd);
+    border-radius: 0 0 28px 28px;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.20);
+    padding: 35px 40px 40px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    transition: opacity 0.35s ease, transform 0.35s ease, visibility 0.35s ease;
+    z-index: 9999;
+    direction: rtl;
+}
+
+.specializations-panel.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.specializations-inner h2 {
+    color: #ffffff;
+    font-size: 32px;
+    margin-bottom: 12px;
+    font-weight: 700;
+}
+
+.specializations-line {
+    width: 100%;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.55);
+    border-radius: 10px;
+    margin-bottom: 30px;
+}
+
+.specializations-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px 40px;
+}
+
+.specialization-item {
+    display: flex;
+    align-items: center;
+    min-height: 60px;
+    padding: 14px 18px;
+    text-decoration: none;
+    color: white;
+    font-size: 22px;
+    font-weight: 600;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    transition: all 0.25s ease;
+}
+
+.specialization-item:hover {
+    background: white;
+    color: #2e77c0;
+    transform: translateY(-3px);
+}
+
+@media (max-width: 1100px) {
+    .specializations-panel {
+        width: 800px;
+        right: -220px;
+    }
+
+    .specializations-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 700px) {
+    .specializations-panel {
+        width: 95vw;
+        right: 0;
+        left: 0;
+        margin: auto;
+        padding: 25px 20px 30px;
+    }
+
+    .specializations-inner h2 {
+        font-size: 26px;
+    }
+
+    .specializations-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .specialization-item {
+        font-size: 18px;
+        min-height: 52px;
+    }
+}
+.slider-course-box {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+}
+
+.slider-course-box .card-link {
+    width: 360px;
+}
+
+.course-actions {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.delete-course-btn {
+    background: #d9534f;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 10px 18px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.25s ease;
+}
+
+.delete-course-btn:hover {
+    background: #b93c37;
+}
+
+
+.all-courses-section {
+    width: 60%;
+    margin: 50px auto 0;
+    display: none;
+}
+
+.all-courses-section.show {
+    display: block;
+}
+
+.all-courses-header {
+    margin-bottom: 30px;
+}
+
+.all-courses-subtitle {
+    margin: 0 0 8px 0;
+    color: #2e77c0;
+    font-weight: 700;
+    font-size: 18px;
+}
+
+.all-courses-title {
+    margin: 0;
+    color: #111;
+    font-size: 32px;
+    font-weight: 700;
+}
+
+.all-courses-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 28px;
+}
+
+.all-course-card {
+    position: relative;
+}
+
+.all-course-link {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: #ffffff;
+    padding: 18px;
+    border-radius: 28px;
+    text-decoration: none;
+    border: 2px solid transparent;
+    box-shadow: 0 10px 10px #00000042;
+    transition: 0.3s ease;
+}
+
+.all-course-link:hover {
+    border: 2px solid #1c5bb4;
+    transform: translateY(-2px);
+}
+
+.all-course-image {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: 24px;
+}
+
+.all-course-badge {
+    padding: 8px 16px;
+    border-radius: 50px;
+    margin: 16px 0 18px;
+    color: #2474e3;
+    background-color: #e1e7ff;
+    font-size: 15px;
+    font-weight: 600;
+    width: fit-content;
+}
+
+.all-course-desc {
+    color: #000;
+    margin: 0 0 30px;
+    font-size: 18px;
+    font-weight: 350;
+    line-height: 1.8;
+    min-height: 100px;
+}
+
+.all-course-arrow {
+    border-radius: 50%;
+    height: 35px;
+    width: 35px;
+    color: #5d91da;
+    margin-top: auto;
+    border: 1px solid #5d91da;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    transition: 0.3s ease;
+    transform: rotate(180deg);
+}
+
+.all-course-link:hover .all-course-arrow {
+    color: #fff;
+    background-color: #397ede;
+    transform: rotate(225deg);
+}
+
+.all-course-delete-form {
+    
+    z-index: 5;
+}
+
+.all-course-delete-btn {
+    width: 38px;
+    height: 38px;
+    border: none;
+    border-radius: 50%;
+    background: #d9534f;
+    color: white;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.18);
+    transition: 0.25s ease;
+}
+
+.all-course-delete-btn:hover {
+    background: #b93c37;
+    transform: scale(1.08);
+}
+.all-course-add-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #bcbcbc;
+    min-height: 100%;
+    height: 100%;
+    padding: 18px;
+    border-radius: 28px;
+    text-decoration: none;
+    border: 2px dashed #0000006b;
+    box-shadow: 0 10px 10px #00000042;
+    transition: 0.3s ease;
+}
+
+.all-course-add-card:hover {
+    background-color: #cdcdcd;
+}
+
+.all-course-add-icon {
+    border: 1px solid #0000006b;
+    font-size: 50px;
+    color: #0000006b;
+    height: 60px;
+    width: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+}
+
+.all-course-add-card h3 {
+    margin-top: 20px;
+    font-size: 18px;
+    color: #0000006b;
+    text-align: center;
+}
+@media (max-width: 1100px) {
+    .all-courses-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 700px) {
+    .all-courses-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .all-courses-title {
+        font-size: 26px;
+    }
+
+    .all-course-desc {
+        font-size: 16px;
+        min-height: auto;
+    }
+}
+.Ar_Del{
     display: flex;
     justify-content: space-between;
-    border: none;
-    margin: 0 auto;
+    margin-top: 63px;
 }
-.submit-course {
-    background-color: #2e77c0;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 10px 20px;
-    cursor: pointer;
-}
-.submit-course:hover {
-    background-color: #296aab;
-}
-.modal-box textarea {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 16px;
-    resize: vertical;
-}
-#closeCourseBtn {
-    background-color: #d9534f;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 10px 20px;
-    cursor: pointer;
-}
-#closeCourseBtn:hover {
-    background-color: #c9302c;
-}
-
-

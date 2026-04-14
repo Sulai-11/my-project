@@ -90,7 +90,7 @@ margin: 150px auto 20px ;
     
 }
 .login-btn{
-    width: 19%;
+    width: 39%;
     margin: 0 auto;
     padding: 6px 0 ;
     font-size: 22px;
@@ -104,6 +104,14 @@ margin: 150px auto 20px ;
 }
 .login-btn:hover{
     background-color: #296aaa;
+}
+
+
+.login-btn.teacher {
+    background-color: #444;
+}
+.login-btn.teacher:hover {
+    background-color: #333;
 }
 .blue-out{
     width: 9%;

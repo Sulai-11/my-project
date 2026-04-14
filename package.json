@@ -1,0 +1,30 @@
+{
+  "name": "html6",
+  "version": "1.0.0",
+  "description": "",
+  "main": "script.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sulai-11/my-project.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/Sulai-11/my-project/issues"
+  },
+  "homepage": "https://github.com/Sulai-11/my-project#readme",
+  "dependencies": {
+    "@google/genai": "^1.48.0",
+    "@n8n/chat": "^1.14.0",
+    "dotenv": "^17.4.0",
+    "express": "^5.2.1",
+    "nodemon": "^3.1.14",
+    "openai": "^6.33.0"
+  }
+}
