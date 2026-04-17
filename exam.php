@@ -1,137 +1,192 @@
+<?php
+session_start();
 
-<html dir="rtl">
+$conn = new mysqli('localhost', 'root', '', 'project');
+$conn->set_charset("utf8mb4");
+
+if ($conn->connect_error) {
+    die("Connection Failed: " . $conn->connect_error);
+}
+
+if (!isset($_GET['course']) || !isset($_GET['chapter'])) {
+    die("بيانات الاختبار غير مكتملة");
+}
+
+$course_code = (int)$_GET['course'];
+$chapter_number = (int)$_GET['chapter'];
+
+if ($chapter_number < 1) {
+    $chapter_number = 1;
+}
+
+/* جلب بيانات الكورس */
+$stmt = $conn->prepare("SELECT course_code, title, total_chapters FROM course WHERE course_code = ?");
+$stmt->bind_param("i", $course_code);
+$stmt->execute();
+$courseResult = $stmt->get_result();
+
+if ($courseResult->num_rows !== 1) {
+    die("الكورس غير موجود");
+}
+
+$course = $courseResult->fetch_assoc();
+$stmt->close();
+
+/* جلب الشابتر الحالي */
+$stmt = $conn->prepare("SELECT chapter_code, number, title FROM chapter WHERE course_code = ? AND number = ?");
+$stmt->bind_param("ii", $course_code, $chapter_number);
+$stmt->execute();
+$chapterResult = $stmt->get_result();
+
+if ($chapterResult->num_rows !== 1) {
+    die("الشابتر غير موجود");
+}
+
+$chapter = $chapterResult->fetch_assoc();
+$stmt->close();
+
+$chapter_code = (int)$chapter['chapter_code'];
+
+/* جلب أسئلة اختبار الشابتر */
+$questions = [];
+
+$stmt = $conn->prepare("
+    SELECT question_id, question_text, question_type
+    FROM question_bank
+    WHERE course_code = ? 
+      AND chapter_code = ?
+      AND question_scope = 'chapter'
+      AND is_active = 1
+    ORDER BY question_id ASC
+    LIMIT 5
+");
+$stmt->bind_param("ii", $course_code, $chapter_code);
+$stmt->execute();
+$result = $stmt->get_result();
+
+while ($row = $result->fetch_assoc()) {
+    $row['options'] = [];
+
+    $stmtOpt = $conn->prepare("
+        SELECT option_label, option_text
+        FROM question_option
+        WHERE question_id = ?
+        ORDER BY option_id ASC
+    ");
+    $stmtOpt->bind_param("i", $row['question_id']);
+    $stmtOpt->execute();
+    $optResult = $stmtOpt->get_result();
+
+    while ($opt = $optResult->fetch_assoc()) {
+        $row['options'][] = $opt;
+    }
+
+    $stmtOpt->close();
+    $questions[] = $row;
+}
+
+$stmt->close();
+$conn->close();
+
+$totalQuestions = count($questions);
+?>
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <title>اختبار الشابتر</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" >
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
-
-    <title>exam site</title>
     <link rel="stylesheet" href="exam.css">
 </head>
 <body>
-     
 
-    
-    <button class="open-sidebar-btn">☰</button>
+<button class="open-sidebar-btn">☰</button>
 
 <div id="mySidebar" class="sidebar">
     <a href="javascript:void(0)" class="close-btn">×</a>
-    
     <a href="second.php" class="a-side">الرئيسية</a>
+    <a href="course.php?id=<?php echo urlencode($course_code); ?>" class="a-side">صفحة الكورس</a>
+    <a href="chapter.php?course=<?php echo urlencode($course_code); ?>&chapter=<?php echo urlencode($chapter_number); ?>" class="a-side">صفحة الشابتر</a>
     <a href="#" class="a-side">مقرراتي</a>
-    <a href="#" class="a-side">التخصصات</a>
-    <a href="#" class="a-side">اتصل بنا</a>
 </div>
 
-    <div class="div-examall" id="ex1">
-        <p class="exam-name">تقنيات الإنترنت</p>
-        <p class="exam-no">Exam 1</p>
-        <?php
-        $num=0; 
+<div class="div-examall">
+    <p class="exam-name"><?php echo htmlspecialchars($course['title']); ?></p>
+    <p class="exam-no">Exam - <?php echo htmlspecialchars($chapter['title']); ?></p>
 
-         function number(){
-            global $num;
-            $num++;
-            echo $num;
-         }
-        ?>
-        <div class="valid-exam" dir="ltr">
-            <a href="#ex1" id="btn-q1"><?php number(); ?></a>
-            <a href="#ex2" id="btn-q2"><?php number(); ?></a>
-            <a href="#ex3" id="btn-q3"><?php number(); ?></a>
-            <a href="#ex4" id="btn-q4"><?php number(); ?></a>
-            <a href="#ex5" id="btn-q5"><?php number(); ?></a>
+    <?php if ($totalQuestions === 0): ?>
+        <div class="div-exam" style="text-align:center;">
+            <div class="div-quist" style="justify-content:center;">
+                <p class="p-quist2" style="text-align:center;">لا توجد أسئلة لهذا الشابتر حتى الآن</p>
+            </div>
+
+            <div class="exam-done" style="margin-top:30px;">
+                <div class="back-exam">
+                    <a href="chapter.php?course=<?php echo urlencode($course_code); ?>&chapter=<?php echo urlencode($chapter_number); ?>">رجوع للشابتر</a>
+                </div>
+                <div class="submit-exam">
+                    <?php if ($chapter_number < (int)$course['total_chapters']): ?>
+                        <a href="chapter.php?course=<?php echo urlencode($course_code); ?>&chapter=<?php echo urlencode($chapter_number + 1); ?>">التالي</a>
+                    <?php else: ?>
+                        <a href="endexam.php?course=<?php echo urlencode($course_code); ?>">الاختبار النهائي</a>
+                    <?php endif; ?>
+                </div>
+            </div>
         </div>
-    <div class="div-exam">
-        <div class="div-quist">
-            <p class="p-quist">1</p>
-            <p class="p-quist2">Which protocol is used to transfer web pages from the server to the browser ?</p>
-            <p class="degree-quist">0 / 1</p>
-        </div>
-        <hr class="exam-hr">
-        <form class="form-q" data-question="1">
-            <label class="btn-ch"> <input type="radio" name="qu1" value="FTP" class="check" > <span class="Q-text">FTP</span> </label>
-            <label class="btn-ch"> <input type="radio" name="qu1" value="HTTP" class="check"> <span class="Q-text">HTTP</span> </label>
-            <label class="btn-ch" id="ex2"> <input type="radio" name="qu1" value="SMTP" class="check" > <span class="Q-text">SMTP</span> </label>
-            <label class="btn-ch"> <input type="radio" name="qu1" value="IP" class="check" > <span class="Q-text">IP</span> </label>
-        </form>
+    <?php else: ?>
+
+    <div class="valid-exam" dir="ltr">
+        <?php for ($i = 1; $i <= $totalQuestions; $i++): ?>
+            <a href="#ex<?php echo $i; ?>" id="btn-q<?php echo $i; ?>"><?php echo $i; ?></a>
+        <?php endfor; ?>
     </div>
 
-    <div class="div-exam" >
-        <div class="div-quist">
-            <p class="p-quist">2</p>
-            <p class="p-quist2">Which of the following is used to define the structure of a web page?</p>
-            <p class="degree-quist">0 / 1</p>
-        </div>
-        <hr class="exam-hr">
-        <form class="form-q" data-question="2">
-            <label class="btn-ch"> <input type="radio" name="qu2" value="CSS" class="check" > <span class="Q-text">CSS</span> </label>
-            <label class="btn-ch"> <input type="radio" name="qu2" value="JavaScript" class="check"> <span class="Q-text">JavaScript</span> </label>
-            <label class="btn-ch" id="ex3"> <input type="radio" name="qu2" value="HTML" class="check" > <span class="Q-text">HTML</span> </label>
-            <label class="btn-ch"> <input type="radio" name="qu2" value="PHP" class="check" > <span class="Q-text">PHP</span> </label>
-        </form>
-    </div>
+    <form action="submit_chapter_exam.php" method="post">
+        <input type="hidden" name="course_code" value="<?php echo $course_code; ?>">
+        <input type="hidden" name="chapter_code" value="<?php echo $chapter_code; ?>">
+        <input type="hidden" name="chapter_number" value="<?php echo $chapter_number; ?>">
 
-    <div class="div-exam">
-        <div class="div-quist">
-            <p class="p-quist">3</p>
-            <p class="p-quist2">What is the main purpose of CSS in web development?</p>
-            <p class="degree-quist">0 / 1</p>
-        </div>
-        <hr class="exam-hr">
-        <form class="form-q" data-question="3">
-            <label class="btn-ch"> <input type="radio" name="qu3" value="create databases" class="check" > <span class="Q-text">To create databases</span> </label>
-            <label class="btn-ch"> <input type="radio" name="qu3" value="design and style" class="check"> <span class="Q-text">To design and style web pages</span> </label>
-            <label class="btn-ch" id="ex4"> <input type="radio" name="qu3" value="send emails" class="check" > <span class="Q-text">To send emails</span> </label>
-            <label class="btn-ch"> <input type="radio" name="qu3" value="server-side" class="check" > <span class="Q-text">To perform server-side calculations</span> </label>
-        </form>
-    </div>
+        <?php foreach ($questions as $index => $question): ?>
+            <div class="div-exam" id="ex<?php echo $index + 1; ?>">
+                <div class="div-quist">
+                    <p class="p-quist"><?php echo $index + 1; ?></p>
+                    <p class="p-quist2"><?php echo htmlspecialchars($question['question_text']); ?></p>
+                    <p class="degree-quist">0 / 1</p>
+                </div>
+                <hr class="exam-hr">
 
-    <div class="div-exam" >
-        <div class="div-quist">
-            <p class="p-quist">4</p>
-            <p class="p-quist2">Which of the following languages runs on the client side (in the browser)?</p>
-            <p class="degree-quist">0 / 1</p>
+                <div class="form-q" data-question="<?php echo $index + 1; ?>">
+                    <?php foreach ($question['options'] as $option): ?>
+                        <label class="btn-ch">
+                            <input
+                                type="radio"
+                                name="answers[<?php echo $question['question_id']; ?>]"
+                                value="<?php echo htmlspecialchars($option['option_text']); ?>"
+                                class="check"
+                                required
+                            >
+                            <span class="Q-text"><?php echo htmlspecialchars($option['option_text']); ?></span>
+                        </label>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        <?php endforeach; ?>
+
+        <div class="exam-done">
+            <div class="back-exam">
+                <a href="chapter.php?course=<?php echo urlencode($course_code); ?>&chapter=<?php echo urlencode($chapter_number); ?>">رجوع</a>
+            </div>
+            <div class="submit-exam">
+                <button type="submit">تقديم</button>
+            </div>
         </div>
-        <hr class="exam-hr">
-        <form class="form-q" data-question="4">
-            <label class="btn-ch"> <input type="radio" name="qu4" value="PHP" class="check" > <span class="Q-text">PHP</span> </label>
-            <label class="btn-ch"> <input type="radio" name="qu4" value="Python" class="check"> <span class="Q-text">Python</span> </label>
-            <label class="btn-ch" id="ex5"> <input type="radio" name="qu4" value="JavaScript" class="check" > <span class="Q-text">JavaScript</span> </label>
-            <label class="btn-ch"> <input type="radio" name="qu4" value="SQL" class="check" > <span class="Q-text">SQL</span> </label>
-        </form>
-    </div>
-    
-    <div class="div-exam">
-        <div class="div-quist">
-            <p class="p-quist">5</p>
-            <p class="p-quist2">What does the acronym “URL” stand for?</p>
-            <p class="degree-quist">0 / 1</p>
-        </div>
-        <hr class="exam-hr">
-        <form class="form-q" data-question="5">
-            <label class="btn-ch"> <input type="radio" name="qu5" value="Universal Routing Link" class="check" > <span class="Q-text">Universal Routing Link</span> </label>
-            <label class="btn-ch"> <input type="radio" name="qu5" value="Uniform Resource Locator" class="check"> <span class="Q-text">Uniform Resource Locator</span> </label>
-            <label class="btn-ch"> <input type="radio" name="qu5" value="Unified Reference Language" class="check" > <span class="Q-text">Unified Reference Language</span> </label>
-            <label class="btn-ch"> <input type="radio" name="qu5" value="Universal Reference Link" class="check" > <span class="Q-text">Universal Reference Link</span> </label>
-        </form>
-    </div>
-    <div class="exam-done">
-        <div class="back-exam">
-            <a href="Lecture 5.html">رجوع</a>
-        </div>
-        
-        <div class="submit-exam">
-            <button>تقديم</button>
-        </div>
-    </div>
+    </form>
+
+    <?php endif; ?>
 </div>
 
 <script>
@@ -139,20 +194,14 @@
     const openBtn = document.querySelector('.open-sidebar-btn');
     const closeBtn = document.querySelector('.close-btn');
 
-    function openSidebar() {
-        sidebar.classList.add('open');
-    }
-
-    function closeSidebar() {
-        sidebar.classList.remove('open');
-    }
+    function openSidebar() { sidebar.classList.add('open'); }
+    function closeSidebar() { sidebar.classList.remove('open'); }
 
     openBtn.addEventListener('click', openSidebar);
     closeBtn.addEventListener('click', closeSidebar);
+
     window.addEventListener('click', function(event) {
-        
         if (sidebar.classList.contains('open')) {
-         
             if (!sidebar.contains(event.target) && !openBtn.contains(event.target)) {
                 closeSidebar();
             }
@@ -160,18 +209,14 @@
     });
 
     document.querySelectorAll('.form-q').forEach(form => {
-    form.addEventListener('change', function() {
-        let qNum = form.getAttribute('data-question');  
-        let btn = document.getElementById('btn-q' + qNum);
-        btn.classList.add('answered');
+        form.addEventListener('change', function() {
+            let qNum = form.getAttribute('data-question');
+            let btn = document.getElementById('btn-q' + qNum);
+            if (btn) btn.classList.add('answered');
+        });
     });
-
-});
 
 </script>
 
-
 </body>
 </html>
-
-

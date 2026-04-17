@@ -1010,7 +1010,7 @@ color: #276bb5;
 .all-course-link {
     display: flex;
     flex-direction: column;
-    height: 100%;
+    height: 500px;
     background-color: #ffffff;
     padding: 18px;
     border-radius: 28px;
@@ -1160,5 +1160,136 @@ color: #276bb5;
 .Ar_Del{
     display: flex;
     justify-content: space-between;
-    margin-top: 63px;
+    margin-top: 90px;
+}
+.Ar_Del_after{
+    display: flex;
+    justify-content: space-between;
+    margin-top: 37px;
+}
+:root {
+  --chat--color--primary: #2e77c0;
+  --chat--color--primary-shade-50: #255f9b;
+  --chat--color--primary--shade-100: #1e4f82;
+
+  --chat--color--secondary: #3d8de0;
+  --chat--color-secondary-shade-50: #2e77c0;
+
+  --chat--color-white: #ffffff;
+  --chat--color-light: #f4f8fc;
+  --chat--color-light-shade-50: #e4edf6;
+  --chat--color-light-shade-100: #cfd9e6;
+  --chat--color-medium: #c7d3df;
+  --chat--color-dark: #16324f;
+  --chat--color-disabled: #c8d0d8;
+  --chat--color-typing: #5d738d;
+
+  --chat--spacing: 1rem;
+  --chat--border-radius: 18px;
+  --chat--transition-duration: 0.2s;
+  --chat--font-family: "Cairo", sans-serif;
+
+  --chat--window--width: 380px;
+  --chat--window--height: 620px;
+  --chat--window--bottom: 24px;
+  --chat--window--right: 24px;
+  --chat--window--z-index: 99999;
+  --chat--window--border: 1px solid #dbe6f1;
+  --chat--window--border-radius: 22px;
+  --chat--window--margin-bottom: 12px;
+
+  --chat--header-height: auto;
+  --chat--header--padding: 18px;
+  --chat--header--background: linear-gradient(135deg, #2e77c0, #3d8de0);
+  --chat--header--color: #ffffff;
+  --chat--header--border-top: none;
+  --chat--header--border-bottom: none;
+  --chat--header--border-left: none;
+  --chat--header--border-right: none;
+  --chat--heading--font-size: 1.3rem;
+  --chat--subtitle--font-size: 0.95rem;
+  --chat--subtitle--line-height: 1.7;
+
+  --chat--message--font-size: 0.98rem;
+  --chat--message--padding: 14px 16px;
+  --chat--message--border-radius: 16px;
+  --chat--message-line-height: 1.8;
+  --chat--message--margin-bottom: 12px;
+  --chat--message--bot--background: #ffffff;
+  --chat--message--bot--color: #16324f;
+  --chat--message--bot--border: 1px solid #e5edf5;
+  --chat--message--user--background: #2e77c0;
+  --chat--message--user--color: #ffffff;
+  --chat--message--user--border: none;
+  --chat--message--pre--background: rgba(0, 0, 0, 0.04);
+  --chat--messages-list--padding: 16px;
+
+  --chat--toggle--size: 62px;
+  --chat--toggle--width: 62px;
+  --chat--toggle--height: 62px;
+  --chat--toggle--border-radius: 50%;
+  --chat--toggle--background: linear-gradient(135deg, #2e77c0, #3d8de0);
+  --chat--toggle--hover--background: #255f9b;
+  --chat--toggle--active--background: #1e4f82;
+  --chat--toggle--color: #ffffff;
+
+  --chat--textarea--height: 56px;
+  --chat--textarea--max-height: 14rem;
+  --chat--input--font-size: 15px;
+  --chat--input--border: 0;
+  --chat--input--border-radius: 0;
+  --chat--input--padding: 0.9rem;
+  --chat--input--background: #ffffff;
+  --chat--input--text-color: #16324f;
+  --chat--input--line-height: 1.5;
+  --chat--input--placeholder--font-size: 15px;
+  --chat--input--border-active: 0;
+  --chat--input--left--panel--width: 2rem;
+
+  --chat--button--padding: 0.7rem 1rem;
+  --chat--button--border-radius: 12px;
+  --chat--button--font-size: 0.95rem;
+  --chat--button--line-height: 1;
+  --chat--button--color--primary: #ffffff;
+  --chat--button--background--primary: #2e77c0;
+  --chat--button--border--primary: none;
+  --chat--button--color--primary--hover: #ffffff;
+  --chat--button--background--primary--hover: #255f9b;
+  --chat--button--border--primary--hover: none;
+
+  --chat--input--send--button--background: #ffffff;
+  --chat--input--send--button--color: #2e77c0;
+  --chat--input--send--button--background-hover: #eef5fb;
+  --chat--input--send--button--color-hover: #255f9b;
+
+  --chat--body--background: #f4f8fc;
+  --chat--footer--background: #ffffff;
+  --chat--footer--color: #16324f;
+}
+
+/* تحسينات شكلية إضافية */
+#n8n-chat {
+  direction: rtl;
+}
+
+#n8n-chat .n8n-chat-window {
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+}
+
+#n8n-chat .n8n-chat-toggle {
+  box-shadow: 0 10px 24px rgba(46, 119, 192, 0.35);
+}
+
+#n8n-chat .n8n-chat-header {
+  text-align: right;
+}
+
+#n8n-chat .n8n-chat-message {
+  text-align: right;
+}
+
+#n8n-chat textarea,
+#n8n-chat input {
+  font-family: "Cairo", sans-serif !important;
 }

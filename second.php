@@ -10,6 +10,35 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
+
+<div id="n8n-chat"></div>
+
+<script type="module">
+  import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
+
+  createChat({
+    webhookUrl: 'https://sulaiman22.app.n8n.cloud/webhook/1cf9b5ad-c416-4aab-9b08-4fcda9cecfff/chat',
+    target: '#n8n-chat',
+    mode: 'window',
+    showWelcomeScreen: true,
+    loadPreviousSession: true,
+    defaultLanguage: 'en',
+    initialMessages: [
+      'هلا 👋',
+      'أنا مساعد دورات مجانية، كيف أقدر أخدمك؟'
+    ],
+    i18n: {
+      en: {
+        title: 'المساعد الذكي',
+        subtitle: 'اسأل عن الكورسات، الشابترات، أو خطوات التعلم',
+        footer: '',
+        getStarted: 'ابدأ المحادثة',
+        inputPlaceholder: 'اكتب سؤالك هنا...'
+      }
+    }
+  });
+</script>
     <title>مشروع تخرج</title>
     <link rel="stylesheet" href="second.css">
     <?php
@@ -19,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     $action = $_POST['action'] ?? '';
 
-    $conn = new mysqli('localhost', 'root', '', 'test');
+    $conn = new mysqli('localhost', 'root', '', 'project');
     if ($conn->connect_error) {
         die("Connection Failed: " . $conn->connect_error);
     }
@@ -153,7 +182,7 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'student') {
 }
 ?>
     <?php
-$conn = new mysqli('localhost', 'root', '', 'test');
+$conn = new mysqli('localhost', 'root', '', 'project');
 if ($conn->connect_error) {
     die("Connection Failed: " . $conn->connect_error);
 }
@@ -291,6 +320,7 @@ if ($result && $result->num_rows > 0) {
                                 <input type="hidden" name="course_code" value="<?php echo htmlspecialchars($course['course_code']); ?>">
                                 <button type="submit" class="all-course-delete-btn">×</button>
                             </form>
+                            
                         <?php endif; ?>
                     </div>
             </a>
@@ -365,7 +395,7 @@ if ($result && $result->num_rows > 0) {
                     <img src="<?php echo htmlspecialchars($course['course_image']); ?>" alt="Card Image" class="all-course-image">
                     <p class="all-course-badge"><?php echo htmlspecialchars($course['title']); ?></p>
                     <p class="all-course-desc"><?php echo htmlspecialchars($course['description']); ?></p>
-                    <div class="Ar_Del">
+                    <div class="Ar_Del_after">
                         <span class="all-course-arrow material-symbols-outlined">arrow_forward</span>
                         <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'teacher'): ?>
                             <form method="post" class="all-course-delete-form" onsubmit="return confirm('هل أنت متأكد من حذف هذا الكورس؟');">
@@ -373,6 +403,7 @@ if ($result && $result->num_rows > 0) {
                                 <input type="hidden" name="course_code" value="<?php echo htmlspecialchars($course['course_code']); ?>">
                                 <button type="submit" class="all-course-delete-btn">×</button>
                             </form>
+                            
                         <?php endif; ?>
                     </div>
                 </a>
@@ -485,6 +516,11 @@ if ($result && $result->num_rows > 0) {
         <input type="number" name="time" placeholder="مثال: 12" class="modal-input" required>
       </div>
 
+        <div class="form-group">
+             <label>عدد الشابترات</label>
+             <input type="number" name="total_chapters" min="1" max="7" placeholder="مثال: 5" class="modal-input" required>
+        </div>
+
       <div class="form-group full-width">
         <label>وصف مختصر للكورس</label>
         <textarea name="description" placeholder="اكتب وصفًا مختصرًا وواضحًا عن الكورس" class="modal-input" rows="3" required></textarea>
@@ -507,6 +543,7 @@ if ($result && $result->num_rows > 0) {
     </div>
   </form>
 </div>
+
 <script>
 const openBtns = document.querySelectorAll(".open-modal");
 const closeBtn = document.getElementById("closeCourseBtn");

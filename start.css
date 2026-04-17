@@ -288,28 +288,13 @@ font-size: 50px;
     white-space: normal;
     word-wrap: break-word;
 }
-.class-title a{
-position: absolute;
-right: 70px;
-top: 450px;
-text-decoration: none;
 
-background-color: #ffffff;
-padding: 15px 45px;
-border-radius: 5px;
-font-size: 1.2rem;
-font-weight: 600;
-color: #28639e;
-transition: background-color .3s ease-in-out;
-}
-.class-title a:hover{
-    background-color: #ebebeb;
-}
 .class{
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.304);
     z-index: 50;
     position: absolute;
-    height: 1300px;
+    min-height: 1300px;
+    height: auto;
     width: 550px;
     background-color: rgb(255, 255, 255);
     top: 240px;
@@ -447,11 +432,13 @@ transition: background-color .3s ease-in-out;
 }
 .content{
     background-color: #ebebeb;
-    height: fit-content;
-     display: flex;
+    min-height: fit-content;
+    display: flex;
     flex-direction: column;
     padding-right: 250px;
-    
+    padding-left: 700px;
+    padding-top: 30px;
+    padding-bottom: 40px;
 }
 .content ul{
     font-size: 1rem;
@@ -507,4 +494,51 @@ transition: background-color .3s ease-in-out;
 }
 .a-2:hover{
      background-color: #28639e;
+}
+.course-actions {
+    position: absolute;
+    right: 70px;
+    top: 450px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    z-index: 3;
+}
+
+.start-btn {
+    text-decoration: none;
+    background-color: #ffffff;
+    padding: 15px 45px;
+    border-radius: 5px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #28639e;
+    transition: 0.3s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.start-btn:hover {
+    background-color: #ebebeb;
+}
+
+.manage-btn {
+    text-decoration: none;
+    background-color: #1f5d96;
+    padding: 15px 28px;
+    border-radius: 5px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #ffffff;
+    transition: 0.3s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+}
+
+.manage-btn:hover {
+    background-color: #184a78;
 }

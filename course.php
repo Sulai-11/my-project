@@ -1,5 +1,7 @@
 <?php
-$conn = new mysqli('localhost', 'root', '', 'test');
+session_start();
+
+$conn = new mysqli('localhost', 'root', '', 'project');
 $conn->set_charset("utf8mb4");
 
 if ($conn->connect_error) {
@@ -96,10 +98,21 @@ if (!empty($course['steps'])) {
  
     </div>
     <div style="background-color: #2d6fb2; height: 650px;" class="class-title">
-        <h1><?php echo htmlspecialchars($course['title']); ?></h1>
-        <p><?php echo htmlspecialchars($course['description']); ?></p>
-        <a href="preexam.php">ابدأ التدريب</a>
+    <h1><?php echo htmlspecialchars($course['title']); ?></h1>
+    <p><?php echo htmlspecialchars($course['description']); ?></p>
+
+    <div class="course-actions">
+        <a href="preexam.php?course=<?php echo urlencode($course['course_code']); ?>" class="start-btn">
+            ابدأ التدريب
+        </a>
+
+        <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'teacher'): ?>
+            <a href="manage_questions.php?course=<?php echo urlencode($course['course_code']); ?>" class="manage-btn">
+                إدارة الأسئلة
+            </a>
+        <?php endif; ?>
     </div>
+</div>
 
     <div class="class">
         <img src="<?php echo htmlspecialchars($course['course_image']); ?>" alt="" class="class-img">
@@ -168,15 +181,15 @@ if (!empty($course['steps'])) {
             <?php endforeach; ?>
         </ul>
 
-        <a href="preexam.php">ابدأ التدريب</a>
+        
 
         <h3 class="h3-2">محتوى الكورس</h3>
         <p>
             <?php echo nl2br(htmlspecialchars($course['content'])); ?>
         </p>
 
-        <a href="preexam.php" class="a-2">ابدأ التدريب</a>
-    </div>
+        
+        </div>
      <script src="start.js"></script>
 </body>
 </html>

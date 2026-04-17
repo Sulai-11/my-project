@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-$conn = new mysqli('localhost', 'root', '', 'test');
+$conn = new mysqli('localhost', 'root', '', 'project');
 $conn->set_charset("utf8mb4");
 
 if ($conn->connect_error) {
@@ -22,12 +22,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $content = $_POST['content'] ?? '';
     $weeks = $_POST['weeks'] ?? 0;
     $time = $_POST['time'] ?? 0;
+    $total_chapters = $_POST['total_chapters'] ?? 5;
     $steps = $_POST['steps'] ?? '';
     $teacher_id = $_SESSION['user_id'];
 
+    $weeks = (int)$weeks;
+    $time = (int)$time;
+    $total_chapters = (int)$total_chapters;
+
+    if ($total_chapters < 1 || $total_chapters > 7) {
+        die("عدد الشابترات يجب أن يكون بين 1 و 7");
+    }
+
     if (
         empty($title) || empty($description) || empty($content) ||
-        empty($weeks) || empty($time) || empty($steps)
+        empty($weeks) || empty($time) || empty($steps) || empty($total_chapters)
     ) {
         die("يرجى تعبئة جميع الحقول");
     }
@@ -46,10 +55,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (move_uploaded_file($_FILES['course_image']['tmp_name'], $targetFile)) {
         $stmt = $conn->prepare("
-            INSERT INTO course (title, description, teacher_id, course_image, steps, content, weeks, time)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO course (title, description, teacher_id, course_image, steps, content, weeks, time, total_chapters)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
-        $stmt->bind_param("ssisssii", $title, $description, $teacher_id, $targetFile, $steps, $content, $weeks, $time);
+
+        $stmt->bind_param(
+            "ssisssiii",
+            $title,
+            $description,
+            $teacher_id,
+            $targetFile,
+            $steps,
+            $content,
+            $weeks,
+            $time,
+            $total_chapters
+        );
 
         if ($stmt->execute()) {
             header("Location: second.php");
