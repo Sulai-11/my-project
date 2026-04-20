@@ -18,7 +18,6 @@ $isTeacher = isset($_SESSION['role']) && $_SESSION['role'] === 'teacher';
 $student_id = (!$isTeacher && isset($_SESSION['user_id'])) ? (int) $_SESSION['user_id'] : 0;
 $showLockedNotice = isset($_GET['locked']) && $_GET['locked'] == '1';
 
-/* جلب بيانات الكورس */
 $stmt = $conn->prepare("SELECT * FROM course WHERE course_code = ?");
 $stmt->bind_param("i", $course_code);
 $stmt->execute();
@@ -34,7 +33,6 @@ $stmt->close();
 $total_chapters = (int)($course['total_chapters'] ?? 5);
 $total_chapters = max(1, min(7, $total_chapters));
 
-/* كل عناوين الشابترات */
 $chapterTitles = [];
 $chapterCodeByNumber = [];
 $stmt = $conn->prepare("SELECT chapter_code, number, title FROM chapter WHERE course_code = ? ORDER BY number ASC");
@@ -48,7 +46,6 @@ while ($row = $listResult->fetch_assoc()) {
 }
 $stmt->close();
 
-/* إنشاء الشابتر تلقائيًا إذا لم يكن موجودًا */
 $stmt = $conn->prepare("SELECT * FROM chapter WHERE course_code = ? AND number = ?");
 $stmt->bind_param("ii", $course_code, $chapter_number);
 $stmt->execute();
@@ -82,7 +79,6 @@ if (!$chapter) {
 $chapterTitles[$chapter_number] = $chapter['title'] ?? ("Chapter " . $chapter_number);
 $chapterCodeByNumber[$chapter_number] = (int)($chapter['chapter_code'] ?? 0);
 
-/* الشابترات غير الموجودة في جدول chapter نعطيها عنوان افتراضي */
 $chapters = [];
 for ($i = 1; $i <= $total_chapters; $i++) {
     $chapters[] = [
@@ -92,7 +88,24 @@ for ($i = 1; $i <= $total_chapters; $i++) {
     ];
 }
 
-/* تقدم الطالب في كويزات الشابترات */
+$completedPre = false;
+if ($student_id > 0) {
+    $stmt = $conn->prepare("
+        SELECT attempt_id
+        FROM exam_attempt
+        WHERE student_id = ?
+          AND course_code = ?
+          AND exam_type = 'pre'
+          AND status = 'submitted'
+        LIMIT 1
+    ");
+    $stmt->bind_param("ii", $student_id, $course_code);
+    $stmt->execute();
+    $preResult = $stmt->get_result();
+    $completedPre = $preResult->num_rows > 0;
+    $stmt->close();
+}
+
 $completedQuizMap = [];
 if ($student_id > 0) {
     $stmt = $conn->prepare("
@@ -130,15 +143,21 @@ for ($i = 1; $i <= $total_chapters; $i++) {
     }
 }
 
-$maxUnlockedChapter = min($total_chapters, $sequentialCompleted + 1);
+$currentChapterStep = $completedPre ? min($total_chapters, $sequentialCompleted + 1) : 1;
 $allChapterQuizzesCompleted = ($sequentialCompleted >= $total_chapters);
 
-if (!$isTeacher && $student_id > 0 && $chapter_number > $maxUnlockedChapter) {
-    header("Location: chapter.php?course=" . urlencode($course_code) . "&chapter=" . urlencode($maxUnlockedChapter) . "&locked=1");
-    exit;
+if (!$isTeacher && $student_id > 0) {
+    if (!$completedPre) {
+        header("Location: preexam.php?course=" . urlencode($course_code) . "&locked=1");
+        exit;
+    }
+
+    if ($chapter_number > $currentChapterStep) {
+        header("Location: chapter.php?course=" . urlencode($course_code) . "&chapter=" . urlencode($currentChapterStep) . "&locked=1");
+        exit;
+    }
 }
 
-/* تحديث الفيديو/المحتوى/العنوان للمعلم */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isTeacher) {
     $action = $_POST['action'] ?? '';
 
@@ -176,7 +195,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isTeacher) {
     }
 }
 
-/* إعادة جلب الشابتر بعد أي تحديث */
 $stmt = $conn->prepare("SELECT * FROM chapter WHERE course_code = ? AND number = ?");
 $stmt->bind_param("ii", $course_code, $chapter_number);
 $stmt->execute();
@@ -206,21 +224,26 @@ function convertToEmbed($url) {
     return $url;
 }
 
-function canOpenChapter($number, $isTeacher, $student_id, $maxUnlockedChapter) {
-    if ($isTeacher || $student_id <= 0) {
-        return true;
-    }
-    return $number <= $maxUnlockedChapter;
-}
-
 function isQuizDone($number, $completedQuizMap) {
     return !empty($completedQuizMap[$number]);
 }
 
+function canOpenChapterNav($number, $isTeacher, $student_id, $completedPre, $currentChapterStep) {
+    if ($isTeacher || $student_id <= 0) return true;
+    if (!$completedPre) return false;
+    return $number <= $currentChapterStep;
+}
+
 $videoEmbed = convertToEmbed($chapter['video'] ?? '');
-$nextChapterNumber = $chapter_number + 1;
 $currentQuizDone = isQuizDone($chapter_number, $completedQuizMap);
-$nextChapterUnlocked = $chapter_number < $total_chapters && canOpenChapter($nextChapterNumber, $isTeacher, $student_id, $maxUnlockedChapter);
+$nextHref = "exam.php?course=" . urlencode($course_code) . "&chapter=" . urlencode($chapter_number) . "&flow=next";
+
+$prevHref = '';
+if ($chapter_number === 1) {
+    $prevHref = "preexam.php?course=" . urlencode($course_code);
+} else {
+    $prevHref = "exam.php?course=" . urlencode($course_code) . "&chapter=" . urlencode($chapter_number - 1);
+}
 
 $conn->close();
 ?>
@@ -302,17 +325,22 @@ $conn->close();
                     <span class="material-symbols-outlined">lock</span>
                     <div>
                         <strong>الوصول مقفول</strong>
-                        <p>أكمل اختبار الشابتر السابق أولًا حتى ينفتح لك الذي بعده.</p>
+                        <p>أي شيء بعد صفحتك الحالية يبقى مقفل حتى تنهي الموجود الآن وتضغط التالي.</p>
                     </div>
                 </div>
             <?php endif; ?>
 
-            <div class="nav-section-label">محتوى الكورس</div>
+            <div class="nav-section-label">مسار التعلم</div>
+
+            <a class="nav-item <?php echo $completedPre ? 'quiz-done' : 'locked-item'; ?>" href="<?php echo $completedPre || $isTeacher || $student_id <= 0 ? 'preexam.php?course=' . urlencode($course_code) : '#'; ?>">
+                <span>البري إكزام</span>
+                <span class="quiz-state"><?php echo $completedPre ? 'مفتوح' : 'مقفل'; ?></span>
+            </a>
 
             <?php foreach ($chapters as $item): ?>
                 <?php
                     $itemNumber = (int)$item['number'];
-                    $chapterUnlocked = canOpenChapter($itemNumber, $isTeacher, $student_id, $maxUnlockedChapter);
+                    $chapterUnlocked = canOpenChapterNav($itemNumber, $isTeacher, $student_id, $completedPre, $currentChapterStep);
                     $quizDone = isQuizDone($itemNumber, $completedQuizMap);
                     $chapterActive = $itemNumber === $chapter_number;
                     $chapterHref = "chapter.php?course=" . urlencode($course_code) . "&chapter=" . urlencode($itemNumber);
@@ -339,15 +367,15 @@ $conn->close();
                         </div>
                     <?php endif; ?>
 
-                    <?php if ($chapterUnlocked): ?>
-                        <a class="nav-item quiz-link <?php echo $quizDone ? 'quiz-done' : ''; ?>" href="<?php echo $quizHref; ?>">
+                    <?php if ($quizDone): ?>
+                        <a class="nav-item quiz-link quiz-done" href="<?php echo $quizHref; ?>">
                             <span>اختبار الشابتر <?php echo $itemNumber; ?></span>
-                            <span class="quiz-state"><?php echo $quizDone ? 'مكتمل' : 'متاح'; ?></span>
+                            <span class="quiz-state">مفتوح</span>
                         </a>
                     <?php else: ?>
                         <div class="nav-item quiz-link locked-item quiz-locked">
                             <span>اختبار الشابتر <?php echo $itemNumber; ?></span>
-                            <span class="quiz-state">مقفل</span>
+                            <span class="quiz-state"><?php echo $chapterActive ? 'التالي' : 'مقفل'; ?></span>
                         </div>
                     <?php endif; ?>
                 </div>
@@ -364,7 +392,7 @@ $conn->close();
             <?php else: ?>
                 <div class="nav-item final-link locked-item">
                     <span>الاختبار النهائي</span>
-                    <span class="nav-status-pill locked-pill">أكمل الشابترات أولًا</span>
+                    <span class="nav-status-pill locked-pill">مقفل</span>
                 </div>
             <?php endif; ?>
         </div>
@@ -377,14 +405,12 @@ $conn->close();
                 <div>
                     <strong>
                         <?php if ($currentQuizDone): ?>
-                            ممتاز، اختبار هذا الشابتر مكتمل.
+                            ممتاز، انتهيت من اختبار هذا الشابتر.
                         <?php else: ?>
-                            أنهِ اختبار هذا الشابتر لفتح الذي بعده.
+                            التالي سيأخذك إلى اختبار هذا الشابتر.
                         <?php endif; ?>
                     </strong>
-                    <p>
-                        التقدم الحالي: <?php echo $sequentialCompleted; ?> / <?php echo $total_chapters; ?> اختبارات مكتملة
-                    </p>
+                    <p>التقدم الحالي: <?php echo $sequentialCompleted; ?> / <?php echo $total_chapters; ?> اختبارات مكتملة</p>
                 </div>
                 <span class="progress-badge"><?php echo $chapter_number; ?>/<?php echo $total_chapters; ?></span>
             </div>
@@ -470,37 +496,8 @@ $conn->close();
             <?php endif; ?>
 
             <div class="chapter-actions">
-                <?php if ($chapter_number > 1): ?>
-                    <a href="chapter.php?course=<?php echo urlencode($course_code); ?>&chapter=<?php echo urlencode($chapter_number - 1); ?>" class="action-btn secondary-btn">
-                        السابق
-                    </a>
-                <?php endif; ?>
-
-                <a href="exam.php?course=<?php echo urlencode($course_code); ?>&chapter=<?php echo urlencode($chapter_number); ?>" class="action-btn primary-btn">
-                    اختبار الشابتر
-                </a>
-
-                <?php if ($chapter_number < $total_chapters): ?>
-                    <?php if ($nextChapterUnlocked): ?>
-                        <a href="chapter.php?course=<?php echo urlencode($course_code); ?>&chapter=<?php echo urlencode($nextChapterNumber); ?>" class="action-btn primary-btn subtle-btn">
-                            الشابتر التالي
-                        </a>
-                    <?php else: ?>
-                        <div class="action-btn disabled-btn">
-                            أكمل اختبار هذا الشابتر لفتح التالي
-                        </div>
-                    <?php endif; ?>
-                <?php else: ?>
-                    <?php if ($isTeacher || $student_id <= 0 || $allChapterQuizzesCompleted): ?>
-                        <a href="endexam.php?course=<?php echo urlencode($course_code); ?>" class="action-btn final-action-btn">
-                            الاختبار النهائي
-                        </a>
-                    <?php else: ?>
-                        <div class="action-btn disabled-btn">
-                            أكمل كل اختبارات الشابترات أولًا
-                        </div>
-                    <?php endif; ?>
-                <?php endif; ?>
+                <a href="<?php echo $prevHref; ?>" class="action-btn secondary-btn">السابق</a>
+                <a href="<?php echo $nextHref; ?>" class="action-btn primary-btn">التالي</a>
             </div>
         </section>
 
