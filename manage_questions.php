@@ -199,6 +199,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="header.css">
     <style>
         *{
             margin:0;
@@ -209,81 +210,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         body{
             background:#efeeee;
-        }
-
-        .header{
-            position:fixed;
-            top:0;
-            right:0;
-            width:100%;
-            height:72px;
-            background:#2e77c0;
-            display:flex;
-            align-items:center;
-            z-index:1000;
-        }
-
-        .head-div{
-            width:15%;
-            display:flex;
-            justify-content:center;
-            align-items:center;
-            gap:8px;
-        }
-
-        .logo{
-            width:46px;
-        }
-
-        .head-logo-p{
-            color:white;
-            font-weight:700;
-            font-size:18px;
-        }
-
-        .header-btns{
-            width:60%;
-            height:100%;
-            display:flex;
-            align-items:center;
-        }
-
-        .a1{
-            width:22%;
-            height:100%;
-            text-decoration:none;
-        }
-
-        .btn2{
-            width:100%;
-            height:100%;
-            border:none;
-            background:#2e77c0;
-            color:white;
-            font-size:15px;
-            cursor:pointer;
-        }
-
-        .btn2:hover{
-            background:#255f9b;
-        }
-
-        .div-signin{
-            width:25%;
-            display:flex;
-            justify-content:flex-end;
-            align-items:center;
-            padding-left:20px;
-        }
-
-        .logout-btn{
-            background:#c9312c9f;
-            color:white;
-            border:none;
-            border-radius:10px;
-            width:95px;
-            height:38px;
-            cursor:pointer;
         }
 
         .page-wrap{
@@ -405,25 +331,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
 
-<div class="header">
-    <div class="head-div">
-        <img class="logo" src="html images/white laptop real.png" alt="">
-        <p class="head-logo-p">دورات مجانية</p>
-    </div>
-
-    <div class="header-btns">
-        <a href="second.php" class="a1"><button class="btn2">الصفحة الرئيسية</button></a>
-        <a href="#" class="a1"><button class="btn2">الأسئلة</button></a>
-        <a href="#" class="a1"><button class="btn2">مقرراتي</button></a>
-        <a href="#" class="a1"><button class="btn2">اتصل بنا</button></a>
-    </div>
-
-    <div class="div-signin">
-        <form action="logout.php" method="post">
-            <button class="logout-btn">تسجيل خروج</button>
-        </form>
-    </div>
-</div>
+<?php include 'header.php'; ?>
 
 <div class="page-wrap">
     <div class="form-box">

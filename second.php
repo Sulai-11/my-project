@@ -7,40 +7,11 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" >
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
-
-<div id="n8n-chat"></div>
-
-<script type="module">
-  import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
-
-  createChat({
-    webhookUrl: 'https://sulaiman22.app.n8n.cloud/webhook/1cf9b5ad-c416-4aab-9b08-4fcda9cecfff/chat',
-    target: '#n8n-chat',
-    mode: 'window',
-    showWelcomeScreen: true,
-    loadPreviousSession: true,
-    defaultLanguage: 'en',
-    initialMessages: [
-      'هلا 👋',
-      'أنا مساعد دورات مجانية، كيف أقدر أخدمك؟'
-    ],
-    i18n: {
-      en: {
-        title: 'المساعد الذكي',
-        subtitle: 'اسأل عن الكورسات، الشابترات، أو خطوات التعلم',
-        footer: '',
-        getStarted: 'ابدأ المحادثة',
-        inputPlaceholder: 'اكتب سؤالك هنا...'
-      }
-    }
-  });
-</script>
     <title>مشروع تخرج</title>
     <link rel="stylesheet" href="second.css">
+    <link rel="stylesheet" href="header.css">
     <?php
 session_start();
 
@@ -167,83 +138,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 ?>
 <?php
-$levelText = "";
-$conn = new mysqli('localhost', 'root', '', 'project');
-if ($conn->connect_error) {
-    die("Connection Failed: " . $conn->connect_error);
-}
-$conn->set_charset("utf8mb4");
 
-if (isset($_SESSION['role']) && $_SESSION['role'] === 'student' && isset($_SESSION['user_id'])) {
-    $student_id = (int) $_SESSION['user_id'];
-    $studentCompleted = 0;
-    $studentLevel = 1;
-
-    $stmt = $conn->prepare("SELECT completed, level FROM student WHERE student_id = ?");
-    $stmt->bind_param("i", $student_id);
-    $stmt->execute();
-    $studentResult = $stmt->get_result();
-
-    if ($studentRow = $studentResult->fetch_assoc()) {
-        $studentCompleted = (int) ($studentRow['completed'] ?? 0);
-        $studentLevel = (int) ($studentRow['level'] ?? 1);
-
-        $dynamicLevel = 0;
-
-        $stmtLevel = $conn->prepare("SELECT level FROM level WHERE ? BETWEEN minimum AND maximum ORDER BY level DESC LIMIT 1");
-        $stmtLevel->bind_param("i", $studentCompleted);
-        $stmtLevel->execute();
-        $levelResult = $stmtLevel->get_result();
-
-        if ($levelRow = $levelResult->fetch_assoc()) {
-            $dynamicLevel = (int) $levelRow['level'];
-        }
-        $stmtLevel->close();
-
-        if ($dynamicLevel === 0) {
-            $stmtLevel = $conn->prepare("SELECT level FROM level WHERE maximum <= ? ORDER BY level DESC LIMIT 1");
-            $stmtLevel->bind_param("i", $studentCompleted);
-            $stmtLevel->execute();
-            $levelResult = $stmtLevel->get_result();
-
-            if ($levelRow = $levelResult->fetch_assoc()) {
-                $dynamicLevel = (int) $levelRow['level'];
-            }
-            $stmtLevel->close();
-        }
-
-        if ($dynamicLevel === 0) {
-            $levelResult = $conn->query("SELECT level FROM level ORDER BY level ASC LIMIT 1");
-            if ($levelResult && $levelRow = $levelResult->fetch_assoc()) {
-                $dynamicLevel = (int) $levelRow['level'];
-            }
-        }
-
-        if ($dynamicLevel > 0) {
-            $studentLevel = $dynamicLevel;
-            if ((int)($studentRow['level'] ?? 0) !== $dynamicLevel) {
-                $stmtUpdateLevel = $conn->prepare("UPDATE student SET level = ? WHERE student_id = ?");
-                $stmtUpdateLevel->bind_param("ii", $dynamicLevel, $student_id);
-                $stmtUpdateLevel->execute();
-                $stmtUpdateLevel->close();
-            }
-        }
-
-        $_SESSION['level'] = $studentLevel;
-        $_SESSION['completed'] = $studentCompleted;
-    }
-    $stmt->close();
-
-    if ($studentLevel == 1) {
-        $levelText = "مبتدئ";
-    } elseif ($studentLevel == 2) {
-        $levelText = "متوسط";
-    } elseif ($studentLevel == 3) {
-        $levelText = "متقدم";
-    } else {
-        $levelText = "المستوى " . $studentLevel;
-    }
-}
+$conn = new mysqli('localhost', 'root', '', 'project'); if ($conn->connect_error) { die("Connection Failed: " . $conn->connect_error); } $conn->set_charset("utf8mb4");
 
 $courses = [];
 $sql = "SELECT course_code, title, description, course_image FROM course";
@@ -254,87 +150,20 @@ if ($result && $result->num_rows > 0) {
         $courses[] = $row;
     }
 }
-
 $conn->close();
 ?>
 </head>
 
-<body>  
-     
-    <div class="header">  
-        
-            <div class="head-div">
-            <img class ="logo" src="html images/white laptop real.png" >
-            <p class="head-logo-p">دورات مجانية</p>
-            </div>
-            <div class="header-btns">
-                <a href="second.php" class="a1"><button class="btn2">الصفحة الرئيسية</button></a>
-<div class="a1 specializations-menu-wrapper">
-    <button class="btn2" id="specializationsBtn">التخصصات</button>
-
-    <div class="specializations-panel" id="specializationsPanel">
-        <div class="specializations-inner">
-            <h2>التخصصات</h2>
-            <div class="specializations-line"></div>
-
-            <div class="specializations-grid">
-                <a href="#" class="specialization-item">علوم الحاسب</a>
-                <a href="#" class="specialization-item">الفنون والتصميم</a>
-                <a href="#" class="specialization-item">إدارة الأعمال</a>
-                <a href="#" class="specialization-item">علم البيانات</a>
-                <a href="#" class="specialization-item">التعليم والتدريس</a>
-                <a href="#" class="specialization-item">الصحة والطب</a>
-                <a href="#" class="specialization-item">الشريعة واصول والدين</a>
-                <a href="#" class="specialization-item">الرياضيات</a>
-                <a href="#" class="specialization-item">الكيمياء</a>
-                <a href="#" class="specialization-item">العلوم</a>
-                <a href="#" class="specialization-item">العلوم الاجتماعية</a>
-                <a href="#" class="specialization-item">الفيزياء</a>
-            </div>
-        </div>
-    </div>
-</div>                <a href="#" class="a1"><button class="btn2">مقرراتي</button></a>  
-                <a href="#" class="a1"><button class="btn2">اتصل بنا</button></a>   
-            </div>
-            
-        
-        <div class="div-signin">
-        <?php if (isset($_SESSION['username'])): ?>
-
-<div class="user-box" dir="rtl">
-    <button class="user-iconn"><i class="fi fi-sr-user"></i></button>
-
-    <span class="user-name"><?php echo htmlspecialchars($_SESSION['username']); ?></span>
-
-    <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'student'): ?>
-    <span class="user-level">المستوى: <?php echo $levelText; ?></span>
-<?php endif; ?>
-
-    <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'teacher'): ?>
-        <button id="openCourseBtn" class="createCourse open-modal">إنشاء كورس</button>
-    <?php endif; ?>
-
-    <form action="logout.php" method="post" style="display:inline;">
-        <button class="logout-btn">تسجيل خروج</button>
-    </form>
-</div>
-
-<?php else: ?>
-
-<a href="signin.php" class="btn5">تسجيل دخول</a>
-
-<?php endif; ?>
-
-        </div>
-        
-         <!-- <button class="user-status">
-  <span class="material-symbols-outlined user-icon">account_circle</span>
-  <span id="level">مبتدئ</span>
-         </button> -->
-
-    </div> 
+<body>
     
-    
+
+
+     <?php include 'header.php'; ?>
+
+
+
+
+
     <div class="content">
         
         <div class="right-content">
@@ -514,7 +343,7 @@ $conn->close();
         <footer>
             <a href="" class="footer-btn">اتصل بنا</a>
             <img src="html images/white laptop real.png" alt="" width="150px">
-            <p>دورات مجانية</p>
+            <p>Edutrack</p>
         <div>
             <a href="">امكانية الوصول</a>
             <a href="">سياسة الإستخدام</a>
@@ -524,30 +353,6 @@ $conn->close();
         </footer>
         
     </div>
-    <!-- <div id="courseModal" class="modal-overlay">
-    <div class="modal-content">
-        <span class="close-modal">&times;</span>
-        
-        <form action="upload_course.php" method="post" enctype="multipart/form-data" class="course-modal-form">
-            <h2>إنشاء كورس جديد</h2>
-            
-            <label>اسم الكورس</label>
-            <input type="text" name="courseName" required>
-            
-            <label>وصف الكورس</label>
-            <textarea name="courseDescription" rows="4" required></textarea>
-            
-            <label>صورة الكورس</label>
-            <input type="file" name="courseImage" accept="image/*" required>
-            
-            <button type="submit" class="submit-course">إنشاء الآن</button>
-        </form>
-    </div>
-</div> -->
-
-
-
-
 
         <script src="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.js"></script>
         <script src="script.js"></script>
@@ -622,7 +427,7 @@ closeBtn.onclick = function() {
     setTimeout(() => modal.style.display = "none", 300);
 }
 </script>
-<script>
+<!-- <script>
 const specializationsBtn = document.getElementById("specializationsBtn");
 const specializationsPanel = document.getElementById("specializationsPanel");
 
@@ -639,7 +444,7 @@ specializationsPanel.addEventListener("click", function(e) {
 document.addEventListener("click", function() {
     specializationsPanel.classList.remove("show");
 });
-</script>
+</script> -->
 
 <script>
 const showAllCoursesBtn = document.getElementById("showAllCoursesBtn");
@@ -664,5 +469,61 @@ showAllCoursesBtn.addEventListener("click", function(e) {
     }
 });
 </script>
+<div id="n8n-chat"></div>
+
+<script type="module">
+  import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
+
+  createChat({
+    webhookUrl: 'https://sulaiman22.app.n8n.cloud/webhook/1cf9b5ad-c416-4aab-9b08-4fcda9cecfff/chat',
+    target: '#n8n-chat',
+    mode: 'window',
+    showWelcomeScreen: true,
+    loadPreviousSession: true,
+    defaultLanguage: 'en',
+    initialMessages: [
+      'هلا 👋',
+      'أنا مساعد دورات مجانية، كيف أقدر أخدمك؟'
+    ],
+    i18n: {
+      en: {
+        title: 'المساعد الذكي',
+        subtitle: 'اسأل عن الكورسات، الشابترات، أو خطوات التعلم',
+        footer: '',
+        getStarted: 'ابدأ المحادثة',
+        inputPlaceholder: 'اكتب سؤالك هنا...'
+      }
+    }
+  });
+</script>
+<!-- <script>
+document.addEventListener("DOMContentLoaded", function () {
+    const levelBtn = document.getElementById("levelToggleBtn");
+    const levelPopup = document.getElementById("levelPopup");
+    const levelBarFill = document.getElementById("levelBarFill");
+
+    if (levelBarFill) {
+        const progress = parseFloat(levelBarFill.dataset.progress || 0);
+        setTimeout(() => {
+            levelBarFill.style.width = progress + "%";
+        }, 150);
+    }
+
+    if (levelBtn && levelPopup) {
+        levelBtn.addEventListener("click", function (e) {
+            e.stopPropagation();
+            levelPopup.classList.toggle("show");
+        });
+
+        levelPopup.addEventListener("click", function (e) {
+            e.stopPropagation();
+        });
+
+        document.addEventListener("click", function () {
+            levelPopup.classList.remove("show");
+        });
+    }
+});
+</script> -->
 </body>
 </html>

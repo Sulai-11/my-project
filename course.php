@@ -32,71 +32,26 @@ if (!empty($course['steps'])) {
     $stepsArray = preg_split("/\r\n|\n|\r/", $course['steps']);
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" >
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
     <title><?php echo htmlspecialchars($course['title']); ?></title>
     <link rel="stylesheet" href="start.css">
+    <link rel="stylesheet" href="header.css">
 </head>
 <body>
 
-    <div class="header">
-        <a href="second.php" class="logo">
-            <img src="html images/white laptop real.png" alt="" width="100px">
-            <p>دورات مجانية</p>
-        </a>
-    </div>
-    <div class="home-side" dir="ltr">
-        <div class="btns-wrapper">
-            <a href="" class="side-p-img">
-                <img src="html images/pc.png" alt="" width="100%" >
-            </a>
-        <button class="open-sidebar-btn">☰</button>
-        </div>
-  <div class="search-wrapper">
-        <input type="text" class="search-input" placeholder="اكتب للبحث...">
-        <button class="search-btn"><i class="fi-rr-search"></i></button>
-  </div>
-  <a href="" class="a-side">
-    <div class="btns-wrapper">
-        <p class="side-p">التخصصات</p>
-<button class="head-btns"><i class="fi fi-sr-graduation-cap"></i></button>
-    </div>
-    </a>
-    <a href="" class="a-side">
-<div class="btns-wrapper">
-    <p class="side-p">المقررات</p>
-<button class="head-btns"><i class="fi fi-ss-book-open-cover"></i></button>
-</div>
-</a>
-<a href="" class="a-side">
-<div class="btns-wrapper">
-    <p class="side-p">مقرراتي</p>
-<button class="head-btns"><i class="fi fi-sr-bookmark"></i></button>
-</div>
-</a>
-<a href="" class="a-side">
-<div class="btns-wrapper"> 
-    <p class="side-p">اسئلة عامة</p>
-<button class="head-btns"><i class="fi fi-sr-info"></i></button>
-</div>
-</a>
-<div class="icon-wrapper">
-    <a href="#" class="side-user-p"><p>الحساب</p></a>
-<button class="user-iconn"><i class="fi fi-sr-user"></i></button>
-</div>
- 
-    </div>
+    <?php include 'header.php'; ?> 
+    
     <div style="background-color: #2d6fb2; height: 650px;" class="class-title">
     <h1><?php echo htmlspecialchars($course['title']); ?></h1>
     <p><?php echo htmlspecialchars($course['description']); ?></p>
