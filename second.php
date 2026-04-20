@@ -168,23 +168,81 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 ?>
 <?php
 $levelText = "";
-
-if (isset($_SESSION['role']) && $_SESSION['role'] === 'student') {
-    if ($_SESSION['level'] == 1) {
-        $levelText = "مبتدئ";
-    } elseif ($_SESSION['level'] == 2) {
-        $levelText = "متوسط";
-    } elseif ($_SESSION['level'] == 3) {
-        $levelText = "متقدم";
-    } else {
-        $levelText = "غير معروف";
-    }
-}
-?>
-    <?php
 $conn = new mysqli('localhost', 'root', '', 'project');
 if ($conn->connect_error) {
     die("Connection Failed: " . $conn->connect_error);
+}
+$conn->set_charset("utf8mb4");
+
+if (isset($_SESSION['role']) && $_SESSION['role'] === 'student' && isset($_SESSION['user_id'])) {
+    $student_id = (int) $_SESSION['user_id'];
+    $studentCompleted = 0;
+    $studentLevel = 1;
+
+    $stmt = $conn->prepare("SELECT completed, level FROM student WHERE student_id = ?");
+    $stmt->bind_param("i", $student_id);
+    $stmt->execute();
+    $studentResult = $stmt->get_result();
+
+    if ($studentRow = $studentResult->fetch_assoc()) {
+        $studentCompleted = (int) ($studentRow['completed'] ?? 0);
+        $studentLevel = (int) ($studentRow['level'] ?? 1);
+
+        $dynamicLevel = 0;
+
+        $stmtLevel = $conn->prepare("SELECT level FROM level WHERE ? BETWEEN minimum AND maximum ORDER BY level DESC LIMIT 1");
+        $stmtLevel->bind_param("i", $studentCompleted);
+        $stmtLevel->execute();
+        $levelResult = $stmtLevel->get_result();
+
+        if ($levelRow = $levelResult->fetch_assoc()) {
+            $dynamicLevel = (int) $levelRow['level'];
+        }
+        $stmtLevel->close();
+
+        if ($dynamicLevel === 0) {
+            $stmtLevel = $conn->prepare("SELECT level FROM level WHERE maximum <= ? ORDER BY level DESC LIMIT 1");
+            $stmtLevel->bind_param("i", $studentCompleted);
+            $stmtLevel->execute();
+            $levelResult = $stmtLevel->get_result();
+
+            if ($levelRow = $levelResult->fetch_assoc()) {
+                $dynamicLevel = (int) $levelRow['level'];
+            }
+            $stmtLevel->close();
+        }
+
+        if ($dynamicLevel === 0) {
+            $levelResult = $conn->query("SELECT level FROM level ORDER BY level ASC LIMIT 1");
+            if ($levelResult && $levelRow = $levelResult->fetch_assoc()) {
+                $dynamicLevel = (int) $levelRow['level'];
+            }
+        }
+
+        if ($dynamicLevel > 0) {
+            $studentLevel = $dynamicLevel;
+            if ((int)($studentRow['level'] ?? 0) !== $dynamicLevel) {
+                $stmtUpdateLevel = $conn->prepare("UPDATE student SET level = ? WHERE student_id = ?");
+                $stmtUpdateLevel->bind_param("ii", $dynamicLevel, $student_id);
+                $stmtUpdateLevel->execute();
+                $stmtUpdateLevel->close();
+            }
+        }
+
+        $_SESSION['level'] = $studentLevel;
+        $_SESSION['completed'] = $studentCompleted;
+    }
+    $stmt->close();
+
+    if ($studentLevel == 1) {
+        $levelText = "مبتدئ";
+    } elseif ($studentLevel == 2) {
+        $levelText = "متوسط";
+    } elseif ($studentLevel == 3) {
+        $levelText = "متقدم";
+    } else {
+        $levelText = "المستوى " . $studentLevel;
+    }
 }
 
 $courses = [];
@@ -196,6 +254,8 @@ if ($result && $result->num_rows > 0) {
         $courses[] = $row;
     }
 }
+
+$conn->close();
 ?>
 </head>
 
@@ -244,7 +304,7 @@ if ($result && $result->num_rows > 0) {
 <div class="user-box" dir="rtl">
     <button class="user-iconn"><i class="fi fi-sr-user"></i></button>
 
-    <span class="user-name"><?php echo $_SESSION['username']; ?></span>
+    <span class="user-name"><?php echo htmlspecialchars($_SESSION['username']); ?></span>
 
     <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'student'): ?>
     <span class="user-level">المستوى: <?php echo $levelText; ?></span>
