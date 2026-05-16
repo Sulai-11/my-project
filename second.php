@@ -25,25 +25,166 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
     $conn->set_charset("utf8mb4");
     if ($action == "delete_course") {
-    if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'teacher') {
-        die("غير مصرح لك بحذف الكورس");
+
+    if (!isset($_SESSION['role'], $_SESSION['user_id'])) {
+        die("غير مصرح لك بتنفيذ هذا الإجراء");
     }
 
-    $course_code = $_POST['course_code'] ?? '';
+    $course_code = (int)($_POST['course_code'] ?? 0);
 
-    $stmt = $conn->prepare("DELETE FROM course WHERE course_code = ?");
-    $stmt->bind_param("s", $course_code);
+    if ($course_code <= 0) {
+        die("رقم المهارة غير صحيح");
+    }
 
-    if ($stmt->execute()) {
+    /*
+    |--------------------------------------------------------------------------
+    | Admin: حذف مباشر بدون طلب
+    |--------------------------------------------------------------------------
+    */
+    if ($_SESSION['role'] === 'admin') {
+
+        $stmt = $conn->prepare("SELECT course_code FROM course WHERE course_code = ?");
+        $stmt->bind_param("i", $course_code);
+        $stmt->execute();
+        $courseResult = $stmt->get_result();
+
+        if ($courseResult->num_rows !== 1) {
+            die("المهارة غير موجودة أو تم حذفها مسبقًا");
+        }
+
         $stmt->close();
-        $conn->close();
-        header("Location: second.php");
-        exit;
-    } else {
-        echo "<p style='color:red'>حدث خطأ أثناء حذف الكورس</p>";
+
+        $conn->begin_transaction();
+
+        try {
+            $stmt = $conn->prepare("DELETE pe FROM pre_exam pe INNER JOIN chapter ch ON pe.chapter_code = ch.chapter_code WHERE ch.course_code = ?");
+            $stmt->bind_param("i", $course_code);
+            $stmt->execute();
+            $stmt->close();
+
+            $stmt = $conn->prepare("DELETE cq FROM chapter_quiz cq INNER JOIN chapter ch ON cq.chapter_code = ch.chapter_code WHERE ch.course_code = ?");
+            $stmt->bind_param("i", $course_code);
+            $stmt->execute();
+            $stmt->close();
+
+            $stmt = $conn->prepare("DELETE FROM certificate WHERE course_code = ?");
+            $stmt->bind_param("i", $course_code);
+            $stmt->execute();
+            $stmt->close();
+
+            $stmt = $conn->prepare("DELETE FROM end_exam WHERE course_code = ?");
+            $stmt->bind_param("i", $course_code);
+            $stmt->execute();
+            $stmt->close();
+
+            $stmt = $conn->prepare("DELETE FROM student_course WHERE course_code = ?");
+            $stmt->bind_param("i", $course_code);
+            $stmt->execute();
+            $stmt->close();
+
+            $stmt = $conn->prepare("DELETE FROM course_request WHERE course_code = ?");
+            $stmt->bind_param("i", $course_code);
+            $stmt->execute();
+            $stmt->close();
+
+            $stmt = $conn->prepare("DELETE FROM chapter WHERE course_code = ?");
+            $stmt->bind_param("i", $course_code);
+            $stmt->execute();
+            $stmt->close();
+
+            $stmt = $conn->prepare("DELETE FROM course WHERE course_code = ?");
+            $stmt->bind_param("i", $course_code);
+
+            if (!$stmt->execute()) {
+                throw new Exception("فشل حذف المهارة");
+            }
+
+            $stmt->close();
+
+            $conn->commit();
+            $conn->close();
+
+            header("Location: second.php?request=admin_deleted");
+            exit;
+
+        } catch (Exception $e) {
+            $conn->rollback();
+            die($e->getMessage());
+        }
     }
 
-    $stmt->close();
+    /*
+    |--------------------------------------------------------------------------
+    | Teacher: طلب حذف فقط
+    |--------------------------------------------------------------------------
+    */
+    if ($_SESSION['role'] === 'teacher') {
+
+        $teacher_id = (int)$_SESSION['user_id'];
+
+        $stmt = $conn->prepare("
+            SELECT course_code
+            FROM course
+            WHERE course_code = ? AND teacher_id = ?
+        ");
+
+        $stmt->bind_param("ii", $course_code, $teacher_id);
+        $stmt->execute();
+        $courseResult = $stmt->get_result();
+
+        if ($courseResult->num_rows !== 1) {
+            die("لا يمكنك طلب حذف مهارة لا تملكها");
+        }
+
+        $stmt->close();
+
+        $stmt = $conn->prepare("
+            SELECT request_id
+            FROM course_request
+            WHERE course_code = ?
+              AND teacher_id = ?
+              AND request_type = 'delete'
+              AND status = 'pending'
+            LIMIT 1
+        ");
+
+        $stmt->bind_param("ii", $course_code, $teacher_id);
+        $stmt->execute();
+        $pendingResult = $stmt->get_result();
+
+        if ($pendingResult->num_rows > 0) {
+            die("يوجد طلب حذف معلق لهذه المهارة بالفعل");
+        }
+
+        $stmt->close();
+
+        $payload = json_encode([
+            "message" => "طلب حذف مهارة من المعلم",
+            "course_code" => $course_code
+        ], JSON_UNESCAPED_UNICODE);
+
+        $stmt = $conn->prepare("
+            INSERT INTO course_request
+            (request_type, course_code, teacher_id, payload, status)
+            VALUES ('delete', ?, ?, ?, 'pending')
+        ");
+
+        $stmt->bind_param("iis", $course_code, $teacher_id, $payload);
+
+        if ($stmt->execute()) {
+            $stmt->close();
+            $conn->close();
+
+            header("Location: second.php?request=delete_sent");
+            exit;
+        } else {
+            echo "<p style='color:red'>حدث خطأ أثناء إرسال طلب الحذف للمسؤول</p>";
+        }
+
+        $stmt->close();
+    }
+
+    die("غير مصرح لك بحذف المهارة");
 }
     // التسجيل
     if ($action == "signup") {
@@ -52,10 +193,29 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $last_name  = $_POST['last_name'] ?? '';
     $email      = $_POST['email'] ?? '';
     $password   = $_POST['password'] ?? '';
+    $emailPattern = "/^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.com$/";
 
+if (!preg_match($emailPattern, $email)) {
+    die("<p style='color:red'>البريد الإلكتروني غير صحيح. يجب أن يكون مثل example@gmail.com وينتهي بـ .com</p>");
+}
     $completed = 0;
     $level = 1;
+    $checkStmt = $conn->prepare("
+    SELECT email FROM student WHERE email = ?
+    UNION
+    SELECT email FROM teacher WHERE email = ?
+    UNION
+    SELECT email FROM admin WHERE email = ?
+");
+$checkStmt->bind_param("sss", $email, $email, $email);
+$checkStmt->execute();
+$checkResult = $checkStmt->get_result();
 
+if ($checkResult->num_rows > 0) {
+    die("<p style='color:red'>هذا البريد الإلكتروني مستخدم مسبقًا</p>");
+}
+
+$checkStmt->close();
     $stmt = $conn->prepare("INSERT INTO student (first_name, last_name, email, password, completed, level) VALUES (?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("ssssii", $first_name, $last_name, $email, $password, $completed, $level);
 
@@ -132,6 +292,38 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         $stmt->close();
     }
+    elseif ($type === "admin") {
+
+    $emailPattern = "/^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.com$/";
+
+    if (!preg_match($emailPattern, $email)) {
+        die("<p style='color:red'>البريد الإلكتروني غير صحيح. يجب أن يكون مثل example@gmail.com وينتهي بـ .com</p>");
+    }
+
+    $stmt = $conn->prepare("SELECT admin_id, first_name, last_name, password FROM admin WHERE email = ?");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows === 1) {
+        $row = $result->fetch_assoc();
+
+        if ($row['password'] === $password) {
+            $_SESSION['user_id'] = $row['admin_id'];
+            $_SESSION['username'] = $row['first_name'] . " " . $row['last_name'];
+            $_SESSION['role'] = 'admin';
+
+            header("Location: admin_requests.php");
+            exit;
+        } else {
+            echo "<p style='color:red'>Wrong Password ❌</p>";
+        }
+    } else {
+        echo "<p style='color:red'>Admin not found ❌</p>";
+    }
+
+    $stmt->close();
+}
 }
 
     $conn->close();
@@ -142,7 +334,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 $conn = new mysqli('localhost', 'root', '', 'project'); if ($conn->connect_error) { die("Connection Failed: " . $conn->connect_error); } $conn->set_charset("utf8mb4");
 
 $courses = [];
-$sql = "SELECT course_code, title, description, course_image FROM course";
+$sql = "SELECT course_code, title, description, course_image,teacher_id  FROM course";
 $result = $conn->query($sql);
 
 if ($result && $result->num_rows > 0) {
@@ -156,8 +348,82 @@ $conn->close();
 
 <body>
     
+    <?php if (isset($_GET['request']) && $_GET['request'] === 'add_sent'): ?>
+    <div style="
+        background:#d1fae5;
+        color:#065f46;
+        padding:14px 20px;
+        margin:15px auto;
+        width:90%;
+        border-radius:12px;
+        text-align:center;
+        font-weight:bold;
+        font-family:Cairo, Arial;
+    ">
+        تم إرسال طلب إضافة المهارة إلى المسؤول. ستظهر المهارة بعد الموافقة عليها.
+    </div>
+<?php endif; ?>
 
-
+<?php if (isset($_GET['request']) && $_GET['request'] === 'delete_sent'): ?>
+    <div style="
+        background:#dbeafe;
+        color:#1e40af;
+        padding:14px 20px;
+        margin:15px auto;
+        width:90%;
+        border-radius:12px;
+        text-align:center;
+        font-weight:bold;
+        font-family:Cairo, Arial;
+    ">
+        تم إرسال طلب حذف المهارة إلى المسؤول. لن يتم حذفها إلا بعد الموافقة.
+    </div>
+<?php endif; ?>
+<?php if (isset($_GET['request']) && $_GET['request'] === 'update_sent'): ?>
+    <div style="
+        background:#fef3c7;
+        color:#92400e;
+        padding:14px 20px;
+        margin:15px auto;
+        width:90%;
+        border-radius:12px;
+        text-align:center;
+        font-weight:bold;
+        font-family:Cairo, Arial;
+    ">
+        تم إرسال طلب تعديل المهارة إلى المسؤول. لن تظهر التعديلات إلا بعد الموافقة.
+    </div>
+<?php endif; ?>
+<?php if (isset($_GET['request']) && $_GET['request'] === 'admin_deleted'): ?>
+    <div style="
+        background:#fee2e2;
+        color:#991b1b;
+        padding:14px 20px;
+        margin:15px auto;
+        width:90%;
+        border-radius:12px;
+        text-align:center;
+        font-weight:bold;
+        font-family:Cairo, Arial;
+    ">
+        تم حذف المهارة مباشرة بواسطة المسؤول.
+    </div>
+<?php endif; ?>
+<?php if (isset($_GET['request']) && $_GET['request'] === 'admin_created'): ?>
+    <div style="
+        background:#d1fae5;
+        color:#065f46;
+        padding:14px 20px;
+        margin:15px auto;
+        width:90%;
+        border-radius:12px;
+        text-align:center;
+        font-weight:bold;
+        font-family:Cairo, Arial;
+    ">
+        تم إنشاء المهارة مباشرة بواسطة المسؤول.
+    </div>
+<?php endif; ?>
      <?php include 'header.php'; ?>
 
 
@@ -170,10 +436,11 @@ $conn->close();
          <b class="content-b1">تعلّم مجاناً</b>
          <br>
          <br>
-         <b class="content-b2">اكتشف مكتبة شاملة من الدورات المجانية <br>عالية الجودة لتعلم أهم المقررات الدراسية</b>
+         <b class="content-b2">اكتشف مكتبة شاملة من الدورات المجانية <br>عالية الجودة لتعلم أهم المهارات</b>
          <div class="third-line-content">
-             <p>البرمجة و قواعد البيانات والذكاء الاصطناعي و تعلم الخوارزميات</p>
-             <p class="second-p">وأكثر</p>
+             <p> توفر المنصة مهارات رقمية وتطبيقية تساعد الطلاب والمتعلمين في المملكة العربية السعودية
+        على تطوير قدراتهم بما يتوافق مع احتياجات سوق العمل، التحول الرقمي، ورؤية السعودية 2030.</p>
+             
          </div>
         </div>
         <div class="left-content">
@@ -183,136 +450,225 @@ $conn->close();
    
     <a href="#" class="course-a" id="showAllCoursesBtn">عرض المزيد</a>
                 
-           
-            <div class="container swiper" id="coursesSliderSection">
-                <div class="store">
-            
+
+    <div class="container" id="coursesSliderSection">
+
+    <div class="store">
         <div class="store-title">
-            <p class="store-p">المقررات</p>
-                <h2>مقررات علوم الحاسب</h2>
-            </div>
+            <p class="store-p">المهارات</p>
+            <h2>مهارات علوم الحاسب</h2>
         </div>
-                <div class="card-wrapper">
-                <ul class="card-list swiper-wrapper">
-                    <?php foreach ($courses as $course): ?>
-    <li class="card-item swiper-slide">
-        <div class="slider-course-box">
-            <a href="course.php?id=<?php echo urlencode($course['course_code']); ?>" class="card-link">
-                <img src="<?php echo htmlspecialchars($course['course_image']); ?>" alt="Card Image" class="card-image">
-                <p class="badge ai"><?php echo htmlspecialchars($course['title']); ?></p>
-                <p class="card-title"><?php echo htmlspecialchars($course['description']); ?></p>
-                <div class="Ar_Del">
-                        <span class="all-course-arrow material-symbols-outlined">arrow_forward</span>
-                        <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'teacher'): ?>
-                            <form method="post" class="all-course-delete-form" onsubmit="return confirm('هل أنت متأكد من حذف هذا الكورس؟');">
-                                <input type="hidden" name="action" value="delete_course">
-                                <input type="hidden" name="course_code" value="<?php echo htmlspecialchars($course['course_code']); ?>">
-                                <button type="submit" class="all-course-delete-btn">×</button>
-                            </form>
-                            
+    </div>
+
+    <div class="card-wrapper swiper">
+
+        <ul class="card-list swiper-wrapper">
+
+            <?php foreach ($courses as $course): ?>
+                <li class="card-item swiper-slide">
+
+                    <div class="slider-course-box course-card-shell">
+
+                        <a href="course.php?id=<?php echo urlencode($course['course_code']); ?>" class="card-link course-main-link">
+
+                            <img 
+                                src="<?php echo htmlspecialchars($course['course_image']); ?>" 
+                                alt="Card Image" 
+                                class="card-image"
+                            >
+
+                            <p class="badge ai">
+                                <?php echo htmlspecialchars($course['title']); ?>
+                            </p>
+
+                            <div class="skill-desc-wrap">
+    <p class="card-title skill-desc-text">
+        <?php echo htmlspecialchars($course['description']); ?>
+    </p>
+</div>
+
+                            <div class="course-enter-row">
+                                <span class="course-enter-text">ابدأ المهارة</span>
+                                <span class="all-course-arrow material-symbols-outlined">arrow_forward</span>
+                            </div>
+
+                        </a>
+
+                        <?php if (
+                            isset($_SESSION['role'], $_SESSION['user_id']) &&
+                            (
+                                ($_SESSION['role'] === 'teacher' && (int)$_SESSION['user_id'] === (int)$course['teacher_id']) ||
+                                $_SESSION['role'] === 'admin'
+                            )
+                        ): ?>
+
+                            <div class="course-manage-actions">
+
+                                <?php if ($_SESSION['role'] === 'teacher'): ?>
+
+                                    <a 
+                                        href="edit_skill_request.php?course=<?php echo urlencode($course['course_code']); ?>" 
+                                        class="course-action-btn edit-action-btn"
+                                    >
+                                        طلب تعديل
+                                    </a>
+
+                                    <form 
+                                        method="post" 
+                                        class="course-action-form" 
+                                        onsubmit="return confirm('سيتم إرسال طلب حذف هذه المهارة إلى المسؤول. هل تريد المتابعة؟');"
+                                    >
+                                        <input type="hidden" name="action" value="delete_course">
+                                        <input 
+                                            type="hidden" 
+                                            name="course_code" 
+                                            value="<?php echo htmlspecialchars($course['course_code']); ?>"
+                                        >
+                                        <button type="submit" class="course-action-btn delete-action-btn">
+                                            طلب حذف
+                                        </button>
+                                    </form>
+
+                                <?php endif; ?>
+
+                                <?php if ($_SESSION['role'] === 'admin'): ?>
+
+                                    <form 
+                                        method="post" 
+                                        class="course-action-form" 
+                                        onsubmit="return confirm('أنت مسؤول النظام. سيتم حذف هذه المهارة مباشرة بدون طلب. هل أنت متأكد؟');"
+                                    >
+                                        <input type="hidden" name="action" value="delete_course">
+                                        <input 
+                                            type="hidden" 
+                                            name="course_code" 
+                                            value="<?php echo htmlspecialchars($course['course_code']); ?>"
+                                        >
+                                        <button type="submit" class="course-action-btn delete-action-btn">
+                                            حذف
+                                        </button>
+                                    </form>
+
+                                <?php endif; ?>
+
+                            </div>
+
                         <?php endif; ?>
+
                     </div>
-            </a>
 
-            
-        </div>
-    </li>
-<?php endforeach; ?>
-
-                    
-                   
-                    
-                    <li class="card-item swiper-slide">
-                        <a href="#" class="card-link">
-                            <img src="html images/الامن السيبراني.jpg" alt="Card Image" class="card-image">
-                            <p class="badge cs">الأمن السيبراني</p>
-                            <h2 class="card-title">هذا المقرر في جامعة نجران يساعد الطالب على التعرف على طرق حماية الأنظمة والمعلومات من الهجمات والاختراقات الإلكترونية.</h2>
-                            <button class="card-button material-symbols-outlined">arrow_forward</button>  
-                        </a>
-                    </li>
-                    <li class="card-item swiper-slide">
-                        <a href="#" class="card-link">
-                            <img src="html images/database.avif" alt="Card Image" class="card-image">
-                            <p class="badge db">قواعد البيانات</p>
-                            <h2 class="card-title">هذا المقرر يساعد الطالب على فهم تصميم قواعد البيانات والتعامل معها باستخدام لغات مثل SQL لإدارة البيانات بكفاءة</h2>
-                            <button class="card-button material-symbols-outlined">arrow_forward</button>
-                        </a>
-                    </li>
-                    <?php if (!isset($_SESSION['role'])): ?>
-<li class="card-item swiper-slide">
-    <a href="signin.php" class="card-link2">
-        <div class="new-course">
-            <p>+</p>
-        </div>
-        <h3>إضافة كورس جديد</h3>
-    </a>
-</li>
-<?php elseif ($_SESSION['role'] === 'teacher'): ?>
-<li class="card-item swiper-slide">
-    <a href="#" class="card-link2 open-modal">
-        <div class="new-course">
-            <p>+</p>
-        </div>
-        <h3>إضافة كورس جديد</h3>
-    </a>
-</li>
-<?php endif; ?>
-                </ul>
-                <div class="swiper-pagination"></div>
-                <div class="swiper-slide-button swiper-button-prev"></div>
-                <div class="swiper-slide-button swiper-button-next"></div>
-            </div>
-        </div>
+                </li>
+            <?php endforeach; ?>
 
 
+            <?php if (!isset($_SESSION['role'])): ?>
 
+                <li class="card-item swiper-slide">
+                    <a href="signin.php" class="card-link2">
+                        <div class="new-course">
+                            <p>+</p>
+                        </div>
+                        <h3>إضافة مهارة جديدة</h3>
+                    </a>
+                </li>
+
+            <?php elseif ($_SESSION['role'] === 'teacher' || $_SESSION['role'] === 'admin'): ?>
+
+                <li class="card-item swiper-slide">
+                    <a href="#" class="card-link2 open-modal">
+                        <div class="new-course">
+                            <p>+</p>
+                        </div>
+                        <h3>إضافة مهارة جديدة</h3>
+                    </a>
+                </li>
+
+            <?php endif; ?>
+
+        </ul>
+
+        <div class="swiper-pagination"></div>
+        
+
+    </div>
+    <div class="swiper-button-prev"></div>
+        <div class="swiper-button-next"></div>
+
+</div>
 
         <div id="allCoursesSection" class="all-courses-section">
     <div class="all-courses-header">
-        <p class="all-courses-subtitle">كل المقررات</p>
-        <h2 class="all-courses-title">جميع الكورسات</h2>
+        <p class="all-courses-subtitle">المهارات</p>
+        <h2 class="all-courses-title">مهارات علوم الحاسب</h2>
     </div>
 
     <div class="all-courses-grid">
 
         <?php foreach ($courses as $course): ?>
-            <div class="all-course-card">
+            <div class="all-course-card course-card-shell">
 
-                
+    <a href="course.php?id=<?php echo urlencode($course['course_code']); ?>" class="all-course-link course-main-link">
+        <img src="<?php echo htmlspecialchars($course['course_image']); ?>" alt="Card Image" class="all-course-image">
 
-                <a href="course.php?id=<?php echo urlencode($course['course_code']); ?>" class="all-course-link">
-                    <img src="<?php echo htmlspecialchars($course['course_image']); ?>" alt="Card Image" class="all-course-image">
-                    <p class="all-course-badge"><?php echo htmlspecialchars($course['title']); ?></p>
-                    <p class="all-course-desc"><?php echo htmlspecialchars($course['description']); ?></p>
-                    <div class="Ar_Del_after">
-                        <span class="all-course-arrow material-symbols-outlined">arrow_forward</span>
-                        <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'teacher'): ?>
-                            <form method="post" class="all-course-delete-form" onsubmit="return confirm('هل أنت متأكد من حذف هذا الكورس؟');">
-                                <input type="hidden" name="action" value="delete_course">
-                                <input type="hidden" name="course_code" value="<?php echo htmlspecialchars($course['course_code']); ?>">
-                                <button type="submit" class="all-course-delete-btn">×</button>
-                            </form>
-                            
-                        <?php endif; ?>
-                    </div>
+        <p class="all-course-badge"><?php echo htmlspecialchars($course['title']); ?></p>
+
+        <div class="skill-desc-wrap">
+    <p class="card-title skill-desc-text">
+        <?php echo htmlspecialchars($course['description']); ?>
+    </p>
+</div>
+
+        <div class="course-enter-row">
+            <span class="course-enter-text">ابدأ المهارة</span>
+            <span class="all-course-arrow material-symbols-outlined">arrow_forward</span>
+        </div>
+    </a>
+
+    <?php if (
+        isset($_SESSION['role'], $_SESSION['user_id']) &&
+        (
+            ($_SESSION['role'] === 'teacher' && (int)$_SESSION['user_id'] === (int)$course['teacher_id']) ||
+            $_SESSION['role'] === 'admin'
+        )
+    ): ?>
+        <div class="course-manage-actions">
+
+            <?php if ($_SESSION['role'] === 'teacher'): ?>
+                <a 
+                    href="edit_skill_request.php?course=<?php echo urlencode($course['course_code']); ?>" 
+                    class="course-action-btn edit-action-btn"
+                >
+                    طلب تعديل
                 </a>
-            </div>
+
+                <form method="post" class="course-action-form" onsubmit="return confirm('سيتم إرسال طلب حذف هذه المهارة إلى المسؤول. هل تريد المتابعة؟');">
+                    <input type="hidden" name="action" value="delete_course">
+                    <input type="hidden" name="course_code" value="<?php echo htmlspecialchars($course['course_code']); ?>">
+                    <button type="submit" class="course-action-btn delete-action-btn">طلب حذف</button>
+                </form>
+            <?php endif; ?>
+
+            <?php if ($_SESSION['role'] === 'admin'): ?>
+                <form method="post" class="course-action-form" onsubmit="return confirm('أنت مسؤول النظام. سيتم حذف هذه المهارة مباشرة بدون طلب. هل أنت متأكد؟');">
+                    <input type="hidden" name="action" value="delete_course">
+                    <input type="hidden" name="course_code" value="<?php echo htmlspecialchars($course['course_code']); ?>">
+                    <button type="submit" class="course-action-btn delete-action-btn">حذف</button>
+                </form>
+            <?php endif; ?>
+
+        </div>
+    <?php endif; ?>
+
+</div>
         <?php endforeach; ?>
 
-        <div class="all-course-card">
-            <a href="#" class="all-course-link">
-                <img src="html images/الامن السيبراني.jpg" alt="Card Image" class="all-course-image">
-                <p class="all-course-badge">الأمن السيبراني</p>
-                <p class="all-course-desc">هذا المقرر في جامعة نجران يساعد الطالب على التعرف على طرق حماية الأنظمة والمعلومات من الهجمات والاختراقات الإلكترونية.</p>
-                <span class="all-course-arrow material-symbols-outlined">arrow_forward</span>
-            </a>
-        </div>
+       
 
         <div class="all-course-card">
             <a href="#" class="all-course-link">
                 <img src="html images/database.avif" alt="Card Image" class="all-course-image">
                 <p class="all-course-badge">قواعد البيانات</p>
-                <p class="all-course-desc">هذا المقرر يساعد الطالب على فهم تصميم قواعد البيانات والتعامل معها باستخدام لغات مثل SQL لإدارة البيانات بكفاءة.</p>
+                <p class="all-course-desc">هذا المهارة يساعد الطالب على فهم تصميم قواعد البيانات والتعامل معها باستخدام لغات مثل SQL لإدارة البيانات بكفاءة.</p>
                 <span class="all-course-arrow material-symbols-outlined">arrow_forward</span>
             </a>
         </div>
@@ -321,14 +677,14 @@ $conn->close();
             <div class="all-course-card">
                 <a href="signin.php" class="all-course-add-card">
                     <div class="all-course-add-icon">+</div>
-                    <h3>إضافة كورس جديد</h3>
+                    <h3>إضافة مهارة جديدة</h3>
                 </a>
             </div>
-        <?php elseif ($_SESSION['role'] === 'teacher'): ?>
+        <?php elseif ($_SESSION['role'] === 'teacher' || $_SESSION['role'] === 'admin'): ?>
             <div class="all-course-card">
                 <a href="#" class="all-course-add-card open-modal">
                     <div class="all-course-add-icon">+</div>
-                    <h3>إضافة كورس جديد</h3>
+                    <h3>إضافة مهارة جديدة</h3>
                 </a>
             </div>
         <?php endif; ?>
@@ -358,16 +714,18 @@ $conn->close();
         <script src="script.js"></script>
         <div id="courseModal" class="modal">
   <form class="modal-box modal-course-form" action="upload_course.php" method="post" enctype="multipart/form-data">
-    <h2>إنشاء كورس</h2>
+<h2>
+    <?php echo (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') ? 'إنشاء مهارة مباشرة' : 'طلب إضافة مهارة'; ?>
+</h2>
 
     <div class="course-form-grid">
       <div class="form-group">
-        <label>اسم الكورس</label>
+<label>اسم المهارة</label>
         <input type="text" name="title" placeholder="مثال: أساسيات HTML" class="modal-input" required>
       </div>
 
       <div class="form-group">
-        <label>صورة الكورس</label>
+        <label>صورة المهارة</label>
         <input type="file" name="course_image" accept="image/*" class="modal-input" required>
       </div>
 
@@ -382,18 +740,18 @@ $conn->close();
       </div>
 
         <div class="form-group">
-             <label>عدد الشابترات</label>
+<label>عدد الوحدات المهارية</label>
              <input type="number" name="total_chapters" min="1" max="7" placeholder="مثال: 5" class="modal-input" required>
         </div>
 
       <div class="form-group full-width">
-        <label>وصف مختصر للكورس</label>
-        <textarea name="description" placeholder="اكتب وصفًا مختصرًا وواضحًا عن الكورس" class="modal-input" rows="3" required></textarea>
+<label>وصف مختصر للمهارة</label>
+        <textarea name="description" placeholder="اكتب وصفًا مختصرًا وواضحًا عن المهارة" class="modal-input" rows="3" required></textarea>
       </div>
 
       <div class="form-group full-width">
-        <label>محتوى الكورس</label>
-        <textarea name="content" placeholder="اكتب محتوى الكورس بالتفصيل" class="modal-input" rows="5" required></textarea>
+        <label>محتوى المهارة</label>
+        <textarea name="content" placeholder="اكتب محتوى المهارة بالتفصيل" class="modal-input" rows="5" required></textarea>
       </div>
 
       <div class="form-group full-width">
@@ -403,7 +761,11 @@ $conn->close();
     </div>
 
     <div class="modal-buttons">
-      <input type="submit" class="submit-course" value="إنشاء">
+      <input 
+    type="submit" 
+    class="submit-course" 
+    value="<?php echo (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') ? 'إنشاء المهارة مباشرة' : 'إرسال الطلب للمسؤول'; ?>"
+>
       <button type="button" id="closeCourseBtn">إلغاء</button>
     </div>
   </form>
@@ -464,6 +826,12 @@ showAllCoursesBtn.addEventListener("click", function(e) {
     } else {
         allCoursesSection.classList.remove("show");
         coursesSliderSection.style.display = "block";
+
+setTimeout(function () {
+    if (window.coursesSwiper) {
+        window.coursesSwiper.update();
+    }
+}, 100);
         showAllCoursesBtn.textContent = "عرض المزيد";
         coursesSliderSection.scrollIntoView({ behavior: "smooth", block: "start" });
     }
@@ -483,12 +851,12 @@ showAllCoursesBtn.addEventListener("click", function(e) {
     defaultLanguage: 'en',
     initialMessages: [
       'هلا 👋',
-      'أنا مساعد دورات مجانية، كيف أقدر أخدمك؟'
+      'أنا مساعد Edutrack، كيف أقدر أخدمك؟'
     ],
     i18n: {
       en: {
         title: 'المساعد الذكي',
-        subtitle: 'اسأل عن الكورسات، الشابترات، أو خطوات التعلم',
+       subtitle: 'اسأل عن المهارات، الوحدات المهارية، أو خطوات التعلم',
         footer: '',
         getStarted: 'ابدأ المحادثة',
         inputPlaceholder: 'اكتب سؤالك هنا...'

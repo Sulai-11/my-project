@@ -176,6 +176,23 @@ footer{
     background-color: #296aab;
 }
 
+
+ 
+.card-wrapper {
+    width: 100%;
+    max-width: 1200px;
+    height: 620px;
+    padding-top: 35px ;
+    overflow: hidden;
+    margin-left: auto;
+    margin-right: auto;
+    
+
+}
+
+
+
+
 .card-list .card-item .card-link{
     width: fit-content;
     user-select: none;
@@ -471,7 +488,7 @@ color: #276bb5;
     background: rgba(0, 0, 0, 0.55);
     justify-content: center;
     align-items: center;
-    z-index: 999999999999;
+    z-index: 999999;
     padding: 20px;
 }
 
@@ -747,7 +764,27 @@ color: #276bb5;
     z-index: 5;
 }
 
+.all-course-delete-btn {
+    width: 38px;
+    height: 38px;
+    border: none;
+    border-radius: 50%;
+    background: #d9534f;
+    color: white;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.18);
+    transition: 0.25s ease;
+}
 
+.all-course-delete-btn:hover {
+    background: #b93c37;
+    transform: scale(1.08);
+}
 .all-course-add-card {
     display: flex;
     flex-direction: column;
@@ -806,7 +843,16 @@ color: #276bb5;
         min-height: auto;
     }
 }
-
+.Ar_Del{
+    display: flex;
+    justify-content: space-between;
+    margin-top: 90px;
+}
+.Ar_Del_after{
+    display: flex;
+    justify-content: space-between;
+    margin-top: 37px;
+}
 :root {
   --chat--color--primary: #2e77c0;
   --chat--color--primary-shade-50: #255f9b;
@@ -932,475 +978,4 @@ color: #276bb5;
 #n8n-chat textarea,
 #n8n-chat input {
   font-family: "Cairo", sans-serif !important;
-}
-/* ================================
-   Course Admin / Teacher Actions
-================================ */
-
-.course-action-btn {
-    min-width: 82px;
-    height: 36px;
-    border: none;
-    border-radius: 999px;
-    color: white;
-    font-size: 13px;
-    font-weight: 800;
-    font-family: "Cairo", sans-serif;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 14px;
-    text-decoration: none;
-    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.16);
-    transition: 0.25s ease;
-    white-space: nowrap;
-}
-
-.course-action-btn:hover {
-    transform: translateY(-2px);
-}
-
-.edit-action-btn {
-    background: #2563eb;
-}
-
-.edit-action-btn:hover {
-    background: #1d4ed8;
-}
-
-.delete-action-btn {
-    background: #d9534f;
-}
-
-.delete-action-btn:hover {
-    background: #b93c37;
-}
-
-
-
-
-
-.all-course-delete-form {
-    margin: 0;
-    display: inline-flex;
-}
-/* ================================
-   Fixed Skill Cards Actions
-================================ */
-
-.course-card-shell {
-    background: #ffffff;
-    border-radius: 30px;
-    padding: 18px;
-    box-shadow: 0 10px 10px #00000042;
-    border: 2px solid transparent;
-    transition: 0.3s ease;
-    overflow: visible;
-}
-
-.course-card-shell:hover {
-    border-color: #1c5bb4;
-    transform: translateY(-2px);
-}
-
-.slider-course-box.course-card-shell {
-    width: 360px;
-    min-height: 520px;
-    display: flex;
-    flex-direction: column;
-}
-
-.slider-course-box.course-card-shell .card-link {
-    width: 100%;
-    padding: 0;
-    box-shadow: none;
-    border: none;
-    border-radius: 0;
-    background: transparent;
-}
-
-.slider-course-box.course-card-shell .card-link:hover {
-    border: none;
-}
-
-.all-course-card.course-card-shell {
-    height: 540px;
-    display: flex;
-    flex-direction: column;
-}
-
-.all-course-card.course-card-shell .all-course-link {
-    height: auto;
-    flex: 1;
-    padding: 0;
-    box-shadow: none;
-    border: none;
-    border-radius: 0;
-    background: transparent;
-}
-
-.all-course-card.course-card-shell .all-course-link:hover {
-    border: none;
-    transform: none;
-}
-
-.course-main-link {
-    text-decoration: none;
-    color: inherit;
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-}
-
-.course-enter-row {
-    margin-top: auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding-top: 12px;
-}
-
-.course-enter-text {
-    color: #2e77c0;
-    font-size: 14px;
-    font-weight: 800;
-}
-
-.course-main-link .all-course-arrow {
-    border-radius: 50%;
-    height: 38px;
-    width: 38px;
-    color: #5d91da;
-    border: 1px solid #5d91da;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: none;
-    transition: 0.3s ease;
-    transform: rotate(180deg);
-    flex-shrink: 0;
-}
-
-.course-main-link:hover .all-course-arrow {
-    color: #ffffff;
-    background-color: #397ede;
-    transform: rotate(225deg);
-}
-
-.course-manage-actions {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    padding-top: 14px;
-    margin-top: 14px;
-    border-top: 1px solid #e8eef5;
-}
-
-.course-action-form {
-    margin: 0;
-    padding: 0;
-    display: inline-flex;
-}
-
-.course-action-btn {
-    min-width: 92px;
-    height: 38px;
-    border: none;
-    border-radius: 999px;
-    color: white;
-    font-size: 13px;
-    font-weight: 800;
-    font-family: "Cairo", sans-serif;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 16px;
-    text-decoration: none;
-    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.14);
-    transition: 0.25s ease;
-    white-space: nowrap;
-}
-
-.course-action-btn:hover {
-    transform: translateY(-2px);
-}
-
-.edit-action-btn {
-    background: #2563eb;
-}
-
-.edit-action-btn:hover {
-    background: #1d4ed8;
-}
-
-.delete-action-btn {
-    background: #d9534f;
-}
-
-.delete-action-btn:hover {
-    background: #b93c37;
-}
-.card-list .card-item .card-link2 {
-    width: 360px;
-    min-height: 520px;
-}
-
-.all-course-add-card {
-    height: 540px;
-}
-/* ================================
-   Professional Description Clamp
-================================ */
-
-.card-title,
-.all-course-desc {
-    position: relative;
-    line-height: 1.75;
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 3; 
-    -webkit-box-orient: vertical;
-    min-height: 95px;
-    max-height: 95px;
-    margin-bottom: 12px;
-}
-
-/* عشان الكرت يظل مرتب والسهم ينزل تحت */
-.course-main-link {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-}
-
-/* يخلي زر ابدأ المهارة ثابت تحت */
-.course-enter-row {
-    margin-top: auto;
-    position: relative;
-    z-index: 2;
-}
-
-/* ================================
-   Fixed Skill Description Tooltip
-================================ */
-
-.skill-desc-wrap {
-    position: relative;
-    height: 105px;
-    min-height: 105px;
-    max-height: 105px;
-    margin-bottom: 14px;
-    z-index: 20;
-}
-
-
-.card-title.skill-desc-text,
-.all-course-desc.skill-desc-text {
-    line-height: 1.75;
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    height: 95px;
-    min-height: 95px;
-    max-height: 95px;
-    margin: 0;
-}
-
-
-
-/* ================================
-   Slider Card Vertical Alignment Fix
-================================ */
-
-.slider-course-box.course-card-shell {
-    width: 360px;
-    height: 540px;
-    min-height: 540px;
-    display: flex;
-    flex-direction: column;
-}
-
-.slider-course-box.course-card-shell .course-main-link {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-}
-
-.slider-course-box.course-card-shell .card-image {
-    height: 190px;
-    object-fit: cover;
-    flex-shrink: 0;
-}
-
-.slider-course-box.course-card-shell .badge {
-    flex-shrink: 0;
-}
-
-.slider-course-box.course-card-shell .skill-desc-wrap {
-    flex-shrink: 0;
-}
-
-.slider-course-box.course-card-shell .course-enter-row {
-    margin-top: auto;
-    padding-top: 16px;
-    min-height: 52px;
-    display: flex;
-    align-items: center;
-}
-
-
-/* رفع أزرار التعديل والحذف داخل كروت السوايبر */
-.card-wrapper .slider-course-box a[href*="edit"],
-.card-wrapper .slider-course-box a[href*="delete"],
-.card-wrapper .slider-course-box button,
-.card-wrapper .course-card-shell a[href*="edit"],
-.card-wrapper .course-card-shell a[href*="delete"],
-.card-wrapper .course-card-shell button {
-    transform: translateY(-8px);
-}
-/* Fix Swiper visibility for student account */
-#coursesSliderSection {
-    width: 100%;
-    max-width: 100%;
-    overflow: hidden;
-    position: relative;
-}
-
-.card-wrapper.swiper {
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 45px 10px 75px;
-    overflow: hidden !important;
-    box-sizing: border-box;
-}
-
-.card-wrapper .swiper-wrapper {
-    align-items: stretch;
-}
-
-.card-wrapper .swiper-slide {
-    display: flex;
-    justify-content: center;
-    align-items: stretch;
-    height: auto;
-    visibility: visible !important;
-}
-
-/* يخلي الكروت تظهر حتى لو عددها قليل عند الطالب */
-.card-wrapper .slider-course-box.course-card-shell {
-    width: 100%;
-    max-width: 360px;
-    height: 540px;
-    min-height: 540px;
-    margin: 0 auto;
-}
-
-/* إذا كان فيه مهارة واحدة أو مهارتين لا تختفي */
-.card-wrapper.swiper-initialized {
-    opacity: 1;
-    visibility: visible;
-}
-
-
-.card-wrapper .swiper-button-prev,
-.card-wrapper .swiper-button-next {
-    width: 44px !important;
-    height: 44px !important;
-    border-radius: 50%;
-    background: #ffffff;
-    color: #2e77c0 !important;
-    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.18);
-    z-index: 30 !important;
-    top: 48% !important;
-}
-
-.swiper-button-prev {
-    right:30px !important;
-    left: auto !important;
-}
-
-.swiper-button-next {
-    left: 30px !important;
-    right: auto !important;
-}
-
-.card-wrapper .swiper-button-prev::after,
-.card-wrapper .swiper-button-next::after {
-    font-size: 18px !important;
-    font-weight: 900 !important;
-}
-/* ================================
-   Skill Description Ellipsis Fix
-================================ */
-
-/* مساحة ثابتة للوصف داخل كرت المهارة */
-.skill-desc-wrap {
-    width: 100%;
-    height: 105px;
-    min-height: 105px;
-    max-height: 105px;
-    margin-bottom: 14px;
-    overflow: hidden;
-    position: relative;
-    z-index: 1;
-}
-
-/* وصف المهارة: يقف بعد 3 أسطر وينتهي بـ ... */
-.skill-desc-text,
-.card-title.skill-desc-text,
-.all-course-desc.skill-desc-text {
-    width: 100%;
-    height: auto;
-    min-height: unset;
-    max-height: none;
-    margin: 0;
-    color: #000;
-    font-size: 18px;
-    font-weight: 350;
-    line-height: 1.75;
-
-    overflow: hidden;
-    display: -webkit-box;
-    
-    -webkit-box-orient: vertical;
-
-    text-overflow: ellipsis;
-}
-
-/* منع ظهور أي مربع tooltip قديم لو بقي في HTML */
-.skill-desc-tooltip {
-    display: none !important;
-}
-
-/* ثبات حجم كروت السوايبر */
-.slider-course-box.course-card-shell {
-    height: 540px;
-    min-height: 540px;
-    max-height: 540px;
-    overflow: hidden;
-}
-
-/* ثبات حجم كروت عرض الكل */
-.all-course-card.course-card-shell {
-    height: 540px;
-    min-height: 540px;
-    max-height: 540px;
-    overflow: hidden;
-}
-
-/* يخلي زر ابدأ المهارة ثابت تحت */
-.course-main-link {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-}
-
-.course-enter-row {
-    margin-top: auto;
-    flex-shrink: 0;
 }

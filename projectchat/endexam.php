@@ -9,7 +9,7 @@ if ($conn->connect_error) {
 }
 
 if (!isset($_GET['course']) || $_GET['course'] === '') {
-    die("المهارة غير موجود");
+    die("الكورس غير موجود");
 }
 
 $course_code = (int)$_GET['course'];
@@ -17,14 +17,14 @@ $isTeacher = isset($_SESSION['role']) && $_SESSION['role'] === 'teacher';
 $student_id = (!$isTeacher && isset($_SESSION['user_id'])) ? (int)$_SESSION['user_id'] : 0;
 $showLockedNotice = isset($_GET['locked']) && $_GET['locked'] == '1';
 
-/* جلب بيانات المهارة */
+/* جلب بيانات الكورس */
 $stmt = $conn->prepare("SELECT course_code, title, total_chapters FROM course WHERE course_code = ?");
 $stmt->bind_param("i", $course_code);
 $stmt->execute();
 $courseResult = $stmt->get_result();
 
 if ($courseResult->num_rows !== 1) {
-    die("المهارة غير موجود");
+    die("الكورس غير موجود");
 }
 
 $course = $courseResult->fetch_assoc();
@@ -33,7 +33,7 @@ $stmt->close();
 $total_chapters = (int)($course['total_chapters'] ?? 5);
 $total_chapters = max(1, min(7, $total_chapters));
 
-/* عناوين الدروس */
+/* عناوين الشابترات */
 $chapterTitles = [];
 $chapterCodeByNumber = [];
 $stmt = $conn->prepare("SELECT chapter_code, number, title FROM chapter WHERE course_code = ? ORDER BY number ASC");
@@ -56,7 +56,7 @@ for ($i = 1; $i <= $total_chapters; $i++) {
     ];
 }
 
-/* تقدم الطالب في كويزات الدروس */
+/* تقدم الطالب في كويزات الشابترات */
 $completedQuizMap = [];
 if ($student_id > 0) {
     $stmt = $conn->prepare("
@@ -689,19 +689,17 @@ function isQuizDone($number, $completedQuizMap) {
                 <span class="material-symbols-outlined">lock</span>
                 <div>
                     <strong>الوصول مقفول</strong>
-                    <div>أكمل كل اختبارات الدروس
-                     أولًا حتى ينفتح لك الاختبار النهائي.</div>
+                    <div>أكمل كل اختبارات الشابترات أولًا حتى ينفتح لك الاختبار النهائي.</div>
                 </div>
             </div>
         <?php endif; ?>
 
         <div class="nav-section-label">روابط سريعة</div>
         <a class="nav-item" href="second.php"><span>الصفحة الرئيسية</span><span class="nav-status-pill open-pill">فتح</span></a>
-        <a class="nav-item" href="course.php?id=<?php echo urlencode($course_code); ?>"><span>صفحة المهارة</span><span class="nav-status-pill open-pill">فتح</span></a>
+        <a class="nav-item" href="course.php?id=<?php echo urlencode($course_code); ?>"><span>صفحة الكورس</span><span class="nav-status-pill open-pill">فتح</span></a>
 
         <div class="nav-divider"></div>
-        <div class="nav-section-label">الدروس
-         والاختبارات</div>
+        <div class="nav-section-label">الشابترات والاختبارات</div>
 
         <?php foreach ($chapters as $item): ?>
             <?php
@@ -713,7 +711,7 @@ function isQuizDone($number, $completedQuizMap) {
                 <?php if ($chapterUnlocked): ?>
                     <a class="nav-item" href="chapter.php?course=<?php echo urlencode($course_code); ?>&chapter=<?php echo urlencode($itemNumber); ?>">
                         <span class="nav-main-text">
-                            <small>درس <?php echo $itemNumber; ?></small>
+                            <small>شابتر <?php echo $itemNumber; ?></small>
                             <strong><?php echo htmlspecialchars($item['title']); ?></strong>
                         </span>
                         <span class="nav-status-pill <?php echo $quizDone ? 'done-pill' : 'open-pill'; ?>">
@@ -723,7 +721,7 @@ function isQuizDone($number, $completedQuizMap) {
                 <?php else: ?>
                     <div class="nav-item locked-item">
                         <span class="nav-main-text">
-                            <small>درس <?php echo $itemNumber; ?></small>
+                            <small>شابتر <?php echo $itemNumber; ?></small>
                             <strong><?php echo htmlspecialchars($item['title']); ?></strong>
                         </span>
                         <span class="nav-status-pill locked-pill">مقفل</span>
@@ -732,12 +730,12 @@ function isQuizDone($number, $completedQuizMap) {
 
                 <?php if ($chapterUnlocked): ?>
                     <a class="nav-item quiz-link <?php echo $quizDone ? 'done' : ''; ?>" href="exam.php?course=<?php echo urlencode($course_code); ?>&chapter=<?php echo urlencode($itemNumber); ?>">
-                        <span>اختبار الدرس <?php echo $itemNumber; ?></span>
+                        <span>اختبار الشابتر <?php echo $itemNumber; ?></span>
                         <span class="nav-status-pill <?php echo $quizDone ? 'done-pill' : 'open-pill'; ?>"><?php echo $quizDone ? 'تم' : 'متاح'; ?></span>
                     </a>
                 <?php else: ?>
                     <div class="nav-item quiz-link locked-item">
-                        <span>اختبار الدرس <?php echo $itemNumber; ?></span>
+                        <span>اختبار الشابتر <?php echo $itemNumber; ?></span>
                         <span class="nav-status-pill locked-pill">مقفل</span>
                     </div>
                 <?php endif; ?>
@@ -756,7 +754,7 @@ function isQuizDone($number, $completedQuizMap) {
         <div class="exam-hero">
             <div>
                 <h1><?php echo htmlspecialchars($course['title']); ?></h1>
-                <p>الاختبار النهائي للمهارة — رتّبت لك الواجهة والتنقل بحيث ما يفتح القادم إلا بعد إكمال الحالي.</p>
+                <p>الاختبار النهائي للكورس — رتّبت لك الواجهة والتنقل بحيث ما يفتح القادم إلا بعد إكمال الحالي.</p>
             </div>
             <div class="hero-badge">
                 <?php echo $totalQuestions; ?><br>سؤال
@@ -779,7 +777,7 @@ function isQuizDone($number, $completedQuizMap) {
 
         <?php if ($totalQuestions === 0): ?>
             <div class="empty-state">
-                <h3>لا توجد أسئلة نهائية لهذا المهارة حتى الآن</h3>
+                <h3>لا توجد أسئلة نهائية لهذا الكورس حتى الآن</h3>
                 <p>أضف أسئلة نهائية من لوحة المعلم ثم ارجع لهذه الصفحة.</p>
             </div>
         <?php else: ?>
@@ -831,7 +829,7 @@ function isQuizDone($number, $completedQuizMap) {
                                 <?php if ($pageNumber > 1): ?>
                                     <button type="button" onclick="goToPage(<?php echo $pageNumber - 1; ?>)">رجوع</button>
                                 <?php else: ?>
-                                    <a href="course.php?id=<?php echo urlencode($course_code); ?>">رجوع للمهارة</a>
+                                    <a href="course.php?id=<?php echo urlencode($course_code); ?>">رجوع للكورس</a>
                                 <?php endif; ?>
                             </div>
 
@@ -881,31 +879,7 @@ function isQuizDone($number, $completedQuizMap) {
                 </div>
             </div>
             <div class="modal-actions">
-                <div class="modal-actions">
-
-    <?php if (!empty($flashResult['certificate_ready'])): ?>
-        <a href="certificate.php?course=<?php echo urlencode($course_code); ?>" style="
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            width:100%;
-            height:52px;
-            margin-bottom:12px;
-            background:#123c69;
-            color:white;
-            border-radius:16px;
-            text-decoration:none;
-            font-weight:800;
-        ">
-            عرض شهادة الإتمام
-        </a>
-    <?php endif; ?>
-
-    <button type="button" onclick="window.location.href='course.php?id=<?php echo urlencode($course_code); ?>'">
-        حسنًا
-    </button>
-
-</div>
+                <button type="button" onclick="window.location.href='course.php?id=<?php echo urlencode($course_code); ?>'">حسنًا</button>
             </div>
         </div>
     </div>

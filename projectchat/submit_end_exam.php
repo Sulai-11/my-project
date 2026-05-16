@@ -13,7 +13,7 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || $_SESSION['role
 }
 
 if (!isset($_GET['course'])) {
-    die("المهارة غير موجود");
+    die("الكورس غير موجود");
 }
 
 $student_id = (int)$_SESSION['user_id'];
@@ -52,7 +52,7 @@ $course = $courseResult->fetch_assoc();
 $stmt->close();
 
 if (!$course) {
-    die("المهارة غير موجود");
+    die("الكورس غير موجود");
 }
 
 /*
@@ -228,14 +228,14 @@ foreach ($topWeakChapters as $ch) {
 
 $studyPlan = [];
 if ($percentage < 50) {
-    $studyPlan[] = "ابدأ بمراجعة الأساسيات أولًا ثم أعد الاختبار بعد إنهاء الدروس الضعيفة.";
-    $studyPlan[] = "ركز على الفهم وليس الحفظ، وحاول حل أمثلة قصيرة بعد كل درس.";
+    $studyPlan[] = "ابدأ بمراجعة الأساسيات أولًا ثم أعد الاختبار بعد إنهاء الشابترات الضعيفة.";
+    $studyPlan[] = "ركز على الفهم وليس الحفظ، وحاول حل أمثلة قصيرة بعد كل شابتر.";
 } elseif ($percentage < 80) {
     $studyPlan[] = "مستواك جيد، لكن تحتاج تقوية النقاط التي أخطأت فيها أكثر من مرة.";
-    $studyPlan[] = "أعد مشاهدة الفيديوهات الخاصة بالدروس الأضعف ثم حل اختباراتها مرة أخرى.";
+    $studyPlan[] = "أعد مشاهدة الفيديوهات الخاصة بالشابترات الأضعف ثم حل اختباراتها مرة أخرى.";
 } else {
     $studyPlan[] = "أداؤك ممتاز، ومستواك يسمح بالانتقال إلى محتوى أكثر تقدمًا.";
-    $studyPlan[] = "حافظ على مستواك بمراجعة سريعة للدروس التي ظهرت فيها أخطاء بسيطة.";
+    $studyPlan[] = "حافظ على مستواك بمراجعة سريعة للشابترات التي ظهرت فيها أخطاء بسيطة.";
 }
 
 $skillHints = [];
@@ -276,7 +276,7 @@ $stmt->close();
 $localRecommendationParts = [];
 
 if (!empty($chapterRecommendations)) {
-    $localRecommendationParts[] = "الدروس الأضعف: " . implode(' | ', $chapterRecommendations);
+    $localRecommendationParts[] = "الشابترات الأضعف: " . implode(' | ', $chapterRecommendations);
 }
 
 if (!empty($studyPlan)) {
@@ -289,7 +289,7 @@ if (!empty($skillHints)) {
 
 if (!empty($courseSuggestions)) {
     $titles = array_map(fn($c) => $c['title'], $courseSuggestions);
-    $localRecommendationParts[] = "مهارات مقترحة: " . implode(' | ', $titles);
+    $localRecommendationParts[] = "كورسات مقترحة: " . implode(' | ', $titles);
 }
 
 if (empty($localRecommendationParts)) {
@@ -379,60 +379,16 @@ if ($attempt_id > 0 && !empty($answerRows)) {
     $stmtAns->close();
 }
 
-/*
-|--------------------------------------------------------------------------
-| إنشاء شهادة للطالب بعد إنهاء الاختبار النهائي
-|--------------------------------------------------------------------------
-*/
-
-$stmt = $conn->prepare("
-    SELECT certificate_code
-    FROM certificate
-    WHERE student_id = ? AND course_code = ?
-    LIMIT 1
-");
-$stmt->bind_param("ii", $student_id, $course_code);
-$stmt->execute();
-$certificateResult = $stmt->get_result();
-
-if ($certificateResult->num_rows === 0) {
-    $stmt->close();
-
-    $stmt = $conn->prepare("
-        INSERT INTO certificate (course_code, student_id, final_grade, date)
-        VALUES (?, ?, ?, CURDATE())
-    ");
-    $finalGrade = (int)$percentage;
-    $stmt->bind_param("iii", $course_code, $student_id, $finalGrade);
-    $stmt->execute();
-    $stmt->close();
-} else {
-    $certificate = $certificateResult->fetch_assoc();
-    $certificate_code = (int)$certificate['certificate_code'];
-    $stmt->close();
-
-    $stmt = $conn->prepare("
-        UPDATE certificate
-        SET final_grade = ?, date = CURDATE()
-        WHERE certificate_code = ?
-    ");
-    $finalGrade = (int)$percentage;
-    $stmt->bind_param("ii", $finalGrade, $certificate_code);
-    $stmt->execute();
-    $stmt->close();
-}
-
 $conn->close();
 
 /*
---------------------------------------------------------------------------
- نخزن نتيجة منظمة لاستخدامها في endexam.php
---------------------------------------------------------------------------
+|--------------------------------------------------------------------------
+| نخزن نتيجة منظمة لاستخدامها في endexam.php
+|--------------------------------------------------------------------------
 */
 $_SESSION['end_exam_result'] = [
     'course_code' => $course_code,
     'score' => $score,
-    'certificate_ready' => true,
     'total' => $total,
     'percentage' => $percentage,
     'levelText' => $levelText,

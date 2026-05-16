@@ -9,7 +9,7 @@ if ($conn->connect_error) {
 }
 
 if (!isset($_GET['id'])) {
-    die("المهارة غير موجودة");
+    die("الكورس غير موجود");
 }
 
 $course_id = (int) $_GET['id'];
@@ -20,7 +20,7 @@ $stmt->execute();
 $result = $stmt->get_result();
 
 if ($result->num_rows !== 1) {
-    die("المهارة غير موجودة");
+    die("الكورس غير موجود");
 }
 
 $course = $result->fetch_assoc();
@@ -55,24 +55,6 @@ if (!empty($course['steps'])) {
     <div style="background-color: #2d6fb2; height: 650px;" class="class-title">
     <h1><?php echo htmlspecialchars($course['title']); ?></h1>
     <p><?php echo htmlspecialchars($course['description']); ?></p>
-
-    <div style="
-    position:relative;
-    top: 535px;
-    left: 23%;
-    margin:18px auto 0;
-    max-width:780px;
-    background:rgba(255,255,255,0.16);
-    color:white;
-    padding:14px 18px;
-    border-radius:16px;
-    line-height:1.8;
-    font-weight:600;
-">
-    هذه المهارة مصممة لدعم المتعلمين في المملكة العربية السعودية، 
-    مع التركيز على المهارات الرقمية المطلوبة في سوق العمل السعودي، 
-    مثل رؤية 2030، التحول الرقمي، والعمل في بيئات تقنية حديثة.
-</div>
 
     <div class="course-actions">
     <a href="preexam.php?course=<?php echo urlencode($course['course_code']); ?>" class="start-btn">
@@ -149,7 +131,7 @@ if (!empty($course['steps'])) {
         <a href="">الصفحة الرئيسية</a>
         <a href="">التخصصات</a>
         <a href="">المقررات</a>
-<a href="">مقرراتي</a>
+        <a href="">مقرراتي</a>
         <a href="">اسئلة عامة</a>
     </div>
     <div dir="rtl" class="content"> 
@@ -162,7 +144,7 @@ if (!empty($course['steps'])) {
 
         
 
-        <h3 class="h3-2">محتوى المهارة</h3>
+        <h3 class="h3-2">محتوى الكورس</h3>
         <p>
             <?php echo nl2br(htmlspecialchars($course['content'])); ?>
         </p>

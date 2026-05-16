@@ -17,7 +17,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 if (!isset($_GET['course']) || $_GET['course'] === '') {
-    die("رقم المهارة غير موجود");
+    die("رقم الكورس غير موجود");
 }
 
 $teacher_id = $_SESSION['user_id'];
@@ -31,7 +31,7 @@ $stmt->execute();
 $courseResult = $stmt->get_result();
 
 if ($courseResult->num_rows !== 1) {
-    die("المهارة غير موجودة");
+    die("الكورس غير موجود");
 }
 
 $course = $courseResult->fetch_assoc();
@@ -61,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $chapter_code = !empty($_POST['chapter_code']) ? (int)$_POST['chapter_code'] : null;
 
     if ($question_scope === 'chapter' && empty($chapter_code)) {
-        $message = "يجب اختيار الدرس";
+        $message = "يجب اختيار الشابتر";
     } elseif ($course_code <= 0 || empty($question_scope) || empty($question_type) || empty($question_text)) {
         $message = "يرجى تعبئة جميع الحقول المطلوبة";
     } else {
@@ -346,7 +346,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <form method="post">
             <div class="grid">
                 <div class="group">
-    <label>المهارة الحالية</label>
+    <label>الكورس الحالي</label>
     <input type="text" class="input" value="<?php echo htmlspecialchars($course['title']); ?>" readonly>
     <input type="hidden" name="course_code" value="<?php echo $course_code; ?>">
 </div>
@@ -362,9 +362,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
 
                 <div class="group" id="chapterBox" style="display:none;">
-                    <label>اختر الدرس</label>
+                    <label>اختر الشابتر</label>
                     <select name="chapter_code" class="input">
-                        <option value="">اختر الدرس</option>
+                        <option value="">اختر الشابتر</option>
                         <?php foreach ($chapters as $chapter): ?>
                             <option value="<?php echo $chapter['chapter_code']; ?>">
                                 <?php echo 'Chapter ' . $chapter['number'] . ' - ' . htmlspecialchars($chapter['title']); ?>

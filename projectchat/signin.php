@@ -17,15 +17,7 @@
 
     <input name="first_name" type="text" class="email" placeholder="الاسم الأول" required>
     <input name="last_name" type="text" class="email" placeholder="اسم العائلة" required>
-    <input 
-    name="email" 
-    type="email" 
-    class="email" 
-    placeholder="البريد الإلكتروني مثل example@gmail.com" 
-    pattern="^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.com$"
-    title="يجب إدخال بريد إلكتروني صحيح وينتهي بـ .com مثل example@gmail.com"
-    required
->
+    <input name="email" type="email" class="email" placeholder="البريد الالكتروني" required>
     <input name="password" type="password" class="email" placeholder="كلمة السر" required>
 
     <input type="submit" class="login-btn" value="تسجيل">
@@ -48,9 +40,6 @@
     <button type="submit" name="login_type" value="teacher" class="login-btn teacher" style="margin-top:10px;">
         تسجيل الدخول كمعلم
     </button>
-    <button type="submit" name="login_type" value="admin" class="login-btn" style="margin-top:10px; background:#111827;">
-    تسجيل الدخول كمسؤول
-</button>
 
 </form>
 

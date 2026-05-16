@@ -25,7 +25,7 @@ $stmt->execute();
 $courseResult = $stmt->get_result();
 
 if ($courseResult->num_rows !== 1) {
-    die("المهارة غير موجود");
+    die("الكورس غير موجود");
 }
 
 $course = $courseResult->fetch_assoc();
@@ -110,7 +110,7 @@ $stmt->execute();
 $chapterResult = $stmt->get_result();
 
 if ($chapterResult->num_rows !== 1) {
-    die("الدرس غير موجود");
+    die("الشابتر غير موجود");
 }
 
 $chapter = $chapterResult->fetch_assoc();
@@ -175,7 +175,7 @@ $nextLabel = ($chapter_number < $total_chapters) ? "التالي" : "الانت�
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>اختبار الدرس</title>
+    <title>اختبار الشابتر</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="exam.css">
 </head>
@@ -185,7 +185,7 @@ $nextLabel = ($chapter_number < $total_chapters) ? "التالي" : "الانت�
     <aside class="sidebar-box">
         <div class="sidebar-head">
             <h3>التنقلات</h3>
-            <span class="mini-chip">اختبار الدرس</span>
+            <span class="mini-chip">اختبار الشابتر</span>
         </div>
 
         <a class="nav-item top-link" href="second.php">
@@ -194,7 +194,7 @@ $nextLabel = ($chapter_number < $total_chapters) ? "التالي" : "الانت�
         </a>
 
         <a class="nav-item top-link" href="course.php?id=<?php echo urlencode($course_code); ?>">
-            <span>صفحة المهارة</span>
+            <span>صفحة الكورس</span>
             <span class="material-symbols-outlined nav-icon">menu_book</span>
         </a>
 
@@ -220,7 +220,7 @@ $nextLabel = ($chapter_number < $total_chapters) ? "التالي" : "الانت�
             </div>
         <?php endif; ?>
 
-        <div class="nav-section-label">مسار المهارة</div>
+        <div class="nav-section-label">مسار الكورس</div>
 
         <a class="nav-item quiz-link done" href="preexam.php?course=<?php echo urlencode($course_code); ?>">
             <span>البري إكزام</span>
@@ -239,7 +239,7 @@ $nextLabel = ($chapter_number < $total_chapters) ? "التالي" : "الانت�
                 <?php if ($chapterOpen || $isTeacher): ?>
                     <a class="nav-item" href="<?php echo $chapterHref; ?>">
                         <span class="nav-main-text">
-                            <small>درس <?php echo $n; ?></small>
+                            <small>شابتر <?php echo $n; ?></small>
                             <strong><?php echo htmlspecialchars($item['title']); ?></strong>
                         </span>
                         <span class="nav-status-pill <?php echo $n === $chapter_number ? 'current-pill' : 'open-pill'; ?>">
@@ -249,7 +249,7 @@ $nextLabel = ($chapter_number < $total_chapters) ? "التالي" : "الانت�
                 <?php else: ?>
                     <div class="nav-item locked-item">
                         <span class="nav-main-text">
-                            <small>درس <?php echo $n; ?></small>
+                            <small>شابتر <?php echo $n; ?></small>
                             <strong><?php echo htmlspecialchars($item['title']); ?></strong>
                         </span>
                         <span class="nav-status-pill locked-pill">مقفل</span>
@@ -258,14 +258,14 @@ $nextLabel = ($chapter_number < $total_chapters) ? "التالي" : "الانت�
 
                 <?php if ($quizDone || $n === $chapter_number): ?>
                     <a class="nav-item quiz-link <?php echo $quizDone ? 'done' : 'active'; ?>" href="<?php echo $n === $chapter_number ? $quizHref . '&flow=next' : $quizHref; ?>">
-                        <span>اختبار الدرس <?php echo $n; ?></span>
+                        <span>اختبار الشابتر <?php echo $n; ?></span>
                         <span class="nav-status-pill <?php echo $quizDone ? 'done-pill' : 'current-pill'; ?>">
                             <?php echo $quizDone ? 'مكتمل' : 'الحالي'; ?>
                         </span>
                     </a>
                 <?php else: ?>
                     <div class="nav-item locked-item">
-                        <span>اختبار الدرس <?php echo $n; ?></span>
+                        <span>اختبار الشابتر <?php echo $n; ?></span>
                         <span class="nav-status-pill locked-pill">مقفل</span>
                     </div>
                 <?php endif; ?>
@@ -291,9 +291,9 @@ $nextLabel = ($chapter_number < $total_chapters) ? "التالي" : "الانت�
     <main class="exam-shell">
         <section class="exam-hero">
             <div>
-                <span class="hero-tag">اختبار الدرس</span>
+                <span class="hero-tag">اختبار الشابتر</span>
                 <h1><?php echo htmlspecialchars($chapter['title']); ?></h1>
-                <p>أجب عن أسئلة هذا الدرس، ثم اضغط التالي للانتقال تلقائيًا إلى العنصر الذي بعده في المسار.</p>
+                <p>أجب عن أسئلة هذا الشابتر، ثم اضغط التالي للانتقال تلقائيًا إلى العنصر الذي بعده في المسار.</p>
             </div>
             <div class="hero-badge">
                 Chapter <?php echo $chapter_number; ?><br>Exam
@@ -303,7 +303,7 @@ $nextLabel = ($chapter_number < $total_chapters) ? "التالي" : "الانت�
         <section class="progress-banner <?php echo !empty($completedQuizMap[$chapter_number]) ? 'success-state' : ''; ?>">
             <div>
                 <strong><?php echo !empty($completedQuizMap[$chapter_number]) ? 'هذا الاختبار مكتمل' : 'الصفحة الحالية'; ?></strong>
-                <p><?php echo $totalQuestions; ?> أسئلة لهذا الدرس</p>
+                <p><?php echo $totalQuestions; ?> أسئلة لهذا الشابتر</p>
             </div>
             <span class="progress-badge"><?php echo $chapter_number; ?> / <?php echo $total_chapters; ?></span>
         </section>
@@ -311,8 +311,8 @@ $nextLabel = ($chapter_number < $total_chapters) ? "التالي" : "الانت�
         <?php if ($totalQuestions === 0): ?>
             <section class="empty-card">
                 <span class="material-symbols-outlined">quiz</span>
-                <h2>لا توجد أسئلة لهذا الدرس</h2>
-                <p>لم يتم إضافة أسئلة لاختبار هذا الدرس حتى الآن.</p>
+                <h2>لا توجد أسئلة لهذا الشابتر</h2>
+                <p>لم يتم إضافة أسئلة لاختبار هذا الشابتر حتى الآن.</p>
                 <div class="action-row">
                     <a href="<?php echo $prevHref; ?>" class="action-btn secondary-btn">السابق</a>
                     <?php if ($chapter_number < $total_chapters): ?>
@@ -365,7 +365,7 @@ $nextLabel = ($chapter_number < $total_chapters) ? "التالي" : "الانت�
                 <section class="submit-panel">
                     <div class="submit-copy">
                         <strong>بعد الإرسال ستنتقل تلقائيًا للعنصر التالي في المسار</strong>
-                        <p><?php echo $chapter_number < $total_chapters ? 'الدرس التالي سيفتح بعد إنهاء هذا الاختبار.' : 'بعد هذا الاختبار سيكون الانتقال إلى الاختبار النهائي.'; ?></p>
+                        <p><?php echo $chapter_number < $total_chapters ? 'الشابتر التالي سيفتح بعد إنهاء هذا الاختبار.' : 'بعد هذا الاختبار سيكون الانتقال إلى الاختبار النهائي.'; ?></p>
                     </div>
 
                     <div class="action-row">

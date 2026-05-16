@@ -1,3 +1,5 @@
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+
 <?php
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -89,60 +91,128 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'student' && isset($_SESSI
                 </div>
             </div>
         </div>
-
-        <a href="#" class="a1"><button class="btn2">مقرراتي</button></a>  
-        <a href="#" class="a1"><button class="btn2">اتصل بنا</button></a>   
+        
+        <a href="#" class="a1"><button class="btn2">مهاراتي</button></a>  
+           
     </div>
 
     <div class="div-signin">
-        <?php if (isset($_SESSION['username'])): ?>
-            <div class="user-box" dir="rtl">
-                <button class="user-iconn"><i class="fi fi-sr-user"></i></button>
+    <?php if (isset($_SESSION['username'])): ?>
 
-                <span class="user-name"><?php echo htmlspecialchars($_SESSION['username']); ?></span>
+        <?php
+            $roleLabel = "مستخدم";
+
+            if (isset($_SESSION['role'])) {
+                if ($_SESSION['role'] === 'admin') {
+                    $roleLabel = "مسؤول النظام";
+                } elseif ($_SESSION['role'] === 'teacher') {
+                    $roleLabel = "معلم";
+                } elseif ($_SESSION['role'] === 'student') {
+                    $roleLabel = "طالب";
+                }
+            }
+        ?>
+
+        <div class="user-menu-wrapper" dir="rtl">
+            <button type="button" class="user-menu-toggle" id="userMenuToggle">
+                <span class="user-menu-avatar">
+                    <i class="fi fi-sr-user"></i>
+                </span>
+
+                <span class="user-menu-info">
+                    <span class="user-menu-name">
+                        <?php echo htmlspecialchars($_SESSION['username']); ?>
+                    </span>
+                    <span class="user-menu-role">
+                        <?php echo htmlspecialchars($roleLabel); ?>
+                    </span>
+                </span>
+
+                <span class="material-symbols-outlined user-menu-arrow">
+                    keyboard_arrow_down
+                </span>
+            </button>
+
+            <div class="user-menu-dropdown" id="userMenuDropdown">
 
                 <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'student'): ?>
-                    <div class="level-dropdown">
-                        <button type="button" class="user-level level-toggle-btn" id="levelToggleBtn">
-                            المستوى: <?php echo htmlspecialchars($levelText); ?>
-                        </button>
 
-                        <div class="level-popup" id="levelPopup">
-                            <div class="level-popup-head">
-                                <strong><?php echo htmlspecialchars($levelText); ?></strong>
-                                <span><?php echo $completedPoints; ?> نقطة</span>
-                            </div>
+                    <div class="student-level-card">
+                        <div class="student-level-head">
+                            <span>المستوى الحالي</span>
+                            <strong><?php echo htmlspecialchars($levelText); ?></strong>
+                        </div>
 
-                            <div class="level-range">
-                                <span><?php echo $levelMin; ?></span>
-                                <span><?php echo $levelMax; ?></span>
-                            </div>
+                        <div class="student-points">
+                            <?php echo (int)$completedPoints; ?> نقطة
+                        </div>
 
-                            <div class="level-bar">
-                                <div class="level-bar-fill" id="levelBarFill" data-progress="<?php echo round($progressPercent, 2); ?>"></div>
-                            </div>
+                        <div class="level-range">
+                            <span><?php echo (int)$levelMin; ?></span>
+                            <span><?php echo (int)$levelMax; ?></span>
+                        </div>
 
-                            <div class="level-popup-info">
-                                <p>تقدمك الحالي: <strong><?php echo $completedPoints; ?></strong></p>
-                                <p>المستوى الحالي: <strong><?php echo htmlspecialchars($levelText); ?></strong></p>
-                                <p>التالي: <strong><?php echo htmlspecialchars($nextLevelText); ?></strong></p>
+                        <div class="level-bar">
+                            <div 
+                                class="level-bar-fill" 
+                                id="levelBarFill" 
+                                data-progress="<?php echo round($progressPercent, 2); ?>">
                             </div>
                         </div>
+
+                        <div class="student-next-level">
+                            التالي: <?php echo htmlspecialchars($nextLevelText); ?>
+                        </div>
                     </div>
+
+                    <a href="my_certificates.php" class="user-menu-item">
+                        <span class="material-symbols-outlined">workspace_premium</span>
+                        شهاداتي
+                    </a>
+
                 <?php endif; ?>
+
 
                 <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'teacher'): ?>
-                    <button id="openCourseBtn" class="createCourse open-modal">إنشاء كورس</button>
+
+                    <button type="button" class="user-menu-item open-modal">
+                        <span class="material-symbols-outlined">add_circle</span>
+                        طلب إضافة مهارة
+                    </button>
+
                 <?php endif; ?>
 
-                <form action="logout.php" method="post" style="display:inline;">
-                    <button class="logout-btn">تسجيل خروج</button>
+
+                <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
+
+                    <button type="button" class="user-menu-item open-modal">
+                        <span class="material-symbols-outlined">add_circle</span>
+                        إنشاء مهارة مباشرة
+                    </button>
+
+                    <a href="admin_requests.php" class="user-menu-item">
+                        <span class="material-symbols-outlined">rule</span>
+                        لوحة طلبات المعلمين
+                    </a>
+
+                <?php endif; ?>
+
+
+                <div class="user-menu-divider"></div>
+
+                <form action="logout.php" method="post">
+                    <button type="submit" class="user-menu-item logout-menu-item">
+                        <span class="material-symbols-outlined">logout</span>
+                        تسجيل خروج
+                    </button>
                 </form>
             </div>
-        <?php else: ?>
-            <a href="signin.php" class="btn5">تسجيل دخول</a>
-        <?php endif; ?>
-    </div>
+        </div>
+
+    <?php else: ?>
+        <a href="signin.php" class="btn5">تسجيل دخول</a>
+    <?php endif; ?>
+</div>
 </div>
 
 <script>
@@ -154,20 +224,22 @@ document.addEventListener("DOMContentLoaded", function () {
         specializationsBtn.addEventListener("click", function(e) {
             e.preventDefault();
             e.stopPropagation();
+
             specializationsPanel.classList.toggle("show");
+
+            const userMenuDropdown = document.getElementById("userMenuDropdown");
+            if (userMenuDropdown) {
+                userMenuDropdown.classList.remove("show");
+            }
         });
 
         specializationsPanel.addEventListener("click", function(e) {
             e.stopPropagation();
         });
-
-        document.addEventListener("click", function() {
-            specializationsPanel.classList.remove("show");
-        });
     }
 
-    const levelBtn = document.getElementById("levelToggleBtn");
-    const levelPopup = document.getElementById("levelPopup");
+    const userMenuToggle = document.getElementById("userMenuToggle");
+    const userMenuDropdown = document.getElementById("userMenuDropdown");
     const levelBarFill = document.getElementById("levelBarFill");
 
     if (levelBarFill) {
@@ -177,20 +249,32 @@ document.addEventListener("DOMContentLoaded", function () {
         }, 150);
     }
 
-    if (levelBtn && levelPopup) {
-        levelBtn.addEventListener("click", function (e) {
+    if (userMenuToggle && userMenuDropdown) {
+        userMenuToggle.addEventListener("click", function(e) {
+            e.preventDefault();
             e.stopPropagation();
-            levelPopup.classList.toggle("show");
+
+            userMenuDropdown.classList.toggle("show");
+
+            if (specializationsPanel) {
+                specializationsPanel.classList.remove("show");
+            }
         });
 
-        levelPopup.addEventListener("click", function (e) {
+        userMenuDropdown.addEventListener("click", function(e) {
             e.stopPropagation();
-        });
-
-        document.addEventListener("click", function () {
-            levelPopup.classList.remove("show");
         });
     }
+
+    document.addEventListener("click", function() {
+        if (specializationsPanel) {
+            specializationsPanel.classList.remove("show");
+        }
+
+        if (userMenuDropdown) {
+            userMenuDropdown.classList.remove("show");
+        }
+    });
 });
 </script>
 

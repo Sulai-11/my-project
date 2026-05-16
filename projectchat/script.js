@@ -1,65 +1,36 @@
-document.addEventListener("DOMContentLoaded", function () {
-    const sliderElement = document.querySelector(".card-wrapper.swiper");
+new Swiper('.card-wrapper', {
 
-    if (!sliderElement) return;
+    
+    spaceBetween: 30,
 
-    const slidesCount = sliderElement.querySelectorAll(".swiper-slide").length;
+    // If we need pagination
+    pagination: {
+        el: '.swiper-pagination',
+        clickable: true,
+        dynamicBullets: true
+    },
 
-    if (slidesCount === 0) {
-        sliderElement.style.display = "none";
-        return;
-    }
+    // Navigation arrows
+    navigation: {
+        nextEl: '.swiper-button-next',
+        prevEl: '.swiper-button-prev',
+    },
 
-    const coursesSwiper = new Swiper(".card-wrapper.swiper", {
-        loop: false,
-        grabCursor: true,
-        speed: 600,
-        spaceBetween: 28,
-        slidesPerView: 1,
-        watchOverflow: false,
-        observer: true,
-        observeParents: true,
+    breakpoints: {
+        0: {
+            slidesPerView: 1
 
-        pagination: {
-            el: ".swiper-pagination",
-            clickable: true,
-            dynamicBullets: true
         },
+        768: {
+            slidesPerView: 2
 
-       navigation: {
-    nextEl: ".swiper-button-next",
-    prevEl: ".swiper-button-prev"
-},
-
-        breakpoints: {
-            0: {
-                slidesPerView: 1,
-                spaceBetween: 16
-            },
-            768: {
-                slidesPerView: slidesCount >= 2 ? 2 : 1,
-                spaceBetween: 22
-            },
-            1024: {
-                slidesPerView: slidesCount >= 3 ? 3 : slidesCount,
-                spaceBetween: 28
-            }
         },
+        1024: {
+            slidesPerView: 3
 
-        on: {
-            init: function () {
-                this.update();
-            },
-            resize: function () {
-                this.update();
-            }
         }
-    });
-
-    window.coursesSwiper = coursesSwiper;
+    }
 });
-
-
 window.addEventListener('beforeunload', () => {
     localStorage.setItem('scrollPosition', window.scrollY);
   });

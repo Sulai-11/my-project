@@ -9,7 +9,7 @@ if ($conn->connect_error) {
 }
 
 if (!isset($_GET['course']) || $_GET['course'] === '') {
-    die("رقم المهارة غير موجود");
+    die("رقم الكورس غير موجود");
 }
 
 $course_code = (int) $_GET['course'];
@@ -23,7 +23,7 @@ $stmt->execute();
 $courseResult = $stmt->get_result();
 
 if ($courseResult->num_rows !== 1) {
-    die("المهارة غير موجودة");
+    die("الكورس غير موجود");
 }
 
 $course = $courseResult->fetch_assoc();
@@ -147,7 +147,7 @@ $conn->close();
         </a>
 
         <a class="nav-item top-link" href="course.php?id=<?php echo urlencode($course_code); ?>">
-            <span>صفحة المهارة</span>
+            <span>صفحة الكورس</span>
             <span class="material-symbols-outlined nav-icon">menu_book</span>
         </a>
 
@@ -163,7 +163,7 @@ $conn->close();
             </div>
         <?php endif; ?>
 
-        <div class="nav-section-label">مسار المهارة</div>
+        <div class="nav-section-label">مسار الكورس</div>
 
         <a class="nav-item <?php echo $completedPre ? 'quiz-link done' : 'quiz-link active'; ?>" href="preexam.php?course=<?php echo urlencode($course_code); ?>">
             <span>البري إكزام</span>
@@ -182,7 +182,7 @@ $conn->close();
                 <?php if ($chapterOpen || $isTeacher): ?>
                     <a class="nav-item" href="chapter.php?course=<?php echo urlencode($course_code); ?>&chapter=<?php echo urlencode($n); ?>">
                         <span class="nav-main-text">
-                            <small>درس <?php echo $n; ?></small>
+                            <small>شابتر <?php echo $n; ?></small>
                             <strong><?php echo htmlspecialchars($item['title']); ?></strong>
                         </span>
                         <span class="nav-status-pill open-pill">مفتوح</span>
@@ -190,7 +190,7 @@ $conn->close();
                 <?php else: ?>
                     <div class="nav-item locked-item">
                         <span class="nav-main-text">
-                            <small>درس <?php echo $n; ?></small>
+                            <small>شابتر <?php echo $n; ?></small>
                             <strong><?php echo htmlspecialchars($item['title']); ?></strong>
                         </span>
                         <span class="nav-status-pill locked-pill">مقفل</span>
@@ -199,12 +199,12 @@ $conn->close();
 
                 <?php if ($quizDone): ?>
                     <a class="nav-item quiz-link done" href="exam.php?course=<?php echo urlencode($course_code); ?>&chapter=<?php echo urlencode($n); ?>">
-                        <span>اختبار الدرس <?php echo $n; ?></span>
+                        <span>اختبار الشابتر <?php echo $n; ?></span>
                         <span class="nav-status-pill done-pill">مكتمل</span>
                     </a>
                 <?php else: ?>
                     <div class="nav-item locked-item">
-                        <span>اختبار الدرس <?php echo $n; ?></span>
+                        <span>اختبار الشابتر <?php echo $n; ?></span>
                         <span class="nav-status-pill locked-pill">مقفل</span>
                     </div>
                 <?php endif; ?>
@@ -225,7 +225,7 @@ $conn->close();
             <div>
                 <span class="hero-tag">تمهيد قبل البداية</span>
                 <h1><?php echo htmlspecialchars($course['title']); ?></h1>
-                <p>هذا الاختبار يقيس مستواك قبل البدء. يمكنك الحل ثم الضغط على التالي، أو استخدام زر التخطي للانتقال مباشرة إلى الدرس الأول.</p>
+                <p>هذا الاختبار يقيس مستواك قبل البدء. يمكنك الحل ثم الضغط على التالي، أو استخدام زر التخطي للانتقال مباشرة إلى الشابتر الأول.</p>
             </div>
             <div class="hero-badge">
                 Pre<br>Exam
@@ -235,7 +235,7 @@ $conn->close();
         <section class="progress-banner">
             <div>
                 <strong>عدد الأسئلة</strong>
-                <p><?php echo $totalQuestions; ?> سؤال تمهيدي لهذه المهارة</p>
+                <p><?php echo $totalQuestions; ?> سؤال تمهيدي لهذا الكورس</p>
             </div>
             <span class="progress-badge">0 / <?php echo $total_chapters; ?></span>
         </section>
@@ -244,7 +244,7 @@ $conn->close();
             <section class="empty-card">
                 <span class="material-symbols-outlined">quiz</span>
                 <h2>لا توجد أسئلة تمهيدية</h2>
-                <p>لم يتم إضافة أسئلة للبري إكزام في هذه المهارة حتى الآن.</p>
+                <p>لم يتم إضافة أسئلة للبري إكزام في هذا الكورس حتى الآن.</p>
                 <div class="action-row">
                     <a href="course.php?id=<?php echo urlencode($course_code); ?>" class="action-btn secondary-btn">رجوع</a>
                     <a href="submit_preexam.php?course=<?php echo urlencode($course_code); ?>&skip=1" class="action-btn primary-btn">تخطي البري إكزام</a>
@@ -290,7 +290,7 @@ $conn->close();
 
                 <section class="submit-panel">
                     <div class="submit-copy">
-                        <strong>بعد الإرسال ستنتقل مباشرة إلى الدرس الأول</strong>
+                        <strong>بعد الإرسال ستنتقل مباشرة إلى الشابتر الأول</strong>
                         <p>يمكنك أيضًا تخطي البري إكزام بدون حل الأسئلة.</p>
                     </div>
 

@@ -86,7 +86,7 @@ $stmt->execute();
 $courseResult = $stmt->get_result();
 
 if ($courseResult->num_rows !== 1) {
-    die("المهارة غير موجودة");
+    die("الكورس غير موجود");
 }
 
 $course = $courseResult->fetch_assoc();
@@ -146,7 +146,7 @@ foreach ($answers as $question_id => $selected_answer) {
 $score = $correct_count;
 $recommendation = '';
 if ($wrong_count === 0) {
-    $recommendation = 'ممتاز جدًا، أداؤك قوي في هذا الدرس.';
+    $recommendation = 'ممتاز جدًا، أداؤك قوي في هذا الشابتر.';
 } else {
     $recommendation = "ينصح بمراجعة:
 - " . implode("

@@ -9,7 +9,7 @@ if ($conn->connect_error) {
 }
 
 if (!isset($_GET['course']) || !isset($_GET['chapter'])) {
-    die("بيانات الدرس غير مكتملة");
+    die("بيانات الشابتر غير مكتملة");
 }
 
 $course_code = (int) $_GET['course'];
@@ -24,7 +24,7 @@ $stmt->execute();
 $courseResult = $stmt->get_result();
 
 if ($courseResult->num_rows !== 1) {
-    die("المهارة غير موجودة");
+    die("الكورس غير موجود");
 }
 
 $course = $courseResult->fetch_assoc();
@@ -73,10 +73,10 @@ $chapter = $chapterResult->fetch_assoc();
 $stmt->close();
 
 if (!$chapter) {
-    die("الدرس غير موجود");
+    die("الشابتر غير موجود");
 }
 
-$chapterTitles[$chapter_number] = $chapter['title'] ?? ("Skill Unit " . $chapter_number);
+$chapterTitles[$chapter_number] = $chapter['title'] ?? ("Chapter " . $chapter_number);
 $chapterCodeByNumber[$chapter_number] = (int)($chapter['chapter_code'] ?? 0);
 
 $chapters = [];
@@ -265,12 +265,12 @@ $conn->close();
 <div class="header">
     <div class="head-div">
         <img class="logo" src="html images/white laptop real.png" alt="">
-        <p class="head-logo-p">Edutrack</p>
+        <p class="head-logo-p">دورات مجانية</p>
     </div>
 
     <div class="header-btns">
         <a href="second.php" class="a1"><button class="btn2">الصفحة الرئيسية</button></a>
-        <a href="course.php?id=<?php echo urlencode($course_code); ?>" class="a1"><button class="btn2">صفحة المهارة</button></a>
+        <a href="course.php?id=<?php echo urlencode($course_code); ?>" class="a1"><button class="btn2">صفحة الكورس</button></a>
         <a href="#" class="a1"><button class="btn2">مقرراتي</button></a>
         <a href="#" class="a1"><button class="btn2">اتصل بنا</button></a>
     </div>
@@ -306,7 +306,7 @@ $conn->close();
         <div class="sidebar-box">
             <div class="sidebar-heading-wrap">
                 <h3>التنقلات</h3>
-                <span class="sidebar-chip"><?php echo $total_chapters; ?> دروس</span>
+                <span class="sidebar-chip"><?php echo $total_chapters; ?> شابترات</span>
             </div>
 
             <a class="nav-item top-link" href="second.php">
@@ -314,7 +314,7 @@ $conn->close();
                 <span class="material-symbols-outlined nav-icon">home</span>
             </a>
             <a class="nav-item top-link" href="course.php?id=<?php echo urlencode($course_code); ?>">
-                <span>صفحة المهارة</span>
+                <span>صفحة الكورس</span>
                 <span class="material-symbols-outlined nav-icon">menu_book</span>
             </a>
 
@@ -333,7 +333,7 @@ $conn->close();
             <div class="nav-section-label">مسار التعلم</div>
 
             <a class="nav-item <?php echo $completedPre ? 'quiz-done' : 'locked-item'; ?>" href="<?php echo $completedPre || $isTeacher || $student_id <= 0 ? 'preexam.php?course=' . urlencode($course_code) : '#'; ?>">
-                <span>الاختبار المبدئي</span>
+                <span>البري إكزام</span>
                 <span class="quiz-state"><?php echo $completedPre ? 'مفتوح' : 'مقفل'; ?></span>
             </a>
 
@@ -350,7 +350,7 @@ $conn->close();
                     <?php if ($chapterUnlocked): ?>
                         <a class="nav-item chapter-link <?php echo $chapterActive ? 'active' : ''; ?>" href="<?php echo $chapterHref; ?>">
                             <span class="nav-main-text">
-                                <small>درس <?php echo $itemNumber; ?></small>
+                                <small>شابتر <?php echo $itemNumber; ?></small>
                                 <strong><?php echo htmlspecialchars($item['title']); ?></strong>
                             </span>
                             <span class="nav-status-pill <?php echo $chapterActive ? 'active-pill' : 'open-pill'; ?>">
@@ -360,7 +360,7 @@ $conn->close();
                     <?php else: ?>
                         <div class="nav-item chapter-link locked-item">
                             <span class="nav-main-text">
-                                <small>درس <?php echo $itemNumber; ?></small>
+                                <small>شابتر <?php echo $itemNumber; ?></small>
                                 <strong><?php echo htmlspecialchars($item['title']); ?></strong>
                             </span>
                             <span class="nav-status-pill locked-pill">مقفل</span>
@@ -369,12 +369,12 @@ $conn->close();
 
                     <?php if ($quizDone): ?>
                         <a class="nav-item quiz-link quiz-done" href="<?php echo $quizHref; ?>">
-                            <span>اختبار الدرس <?php echo $itemNumber; ?></span>
+                            <span>اختبار الشابتر <?php echo $itemNumber; ?></span>
                             <span class="quiz-state">مفتوح</span>
                         </a>
                     <?php else: ?>
                         <div class="nav-item quiz-link locked-item quiz-locked">
-                            <span>اختبار الدرس <?php echo $itemNumber; ?></span>
+                            <span>اختبار الشابتر <?php echo $itemNumber; ?></span>
                             <span class="quiz-state"><?php echo $chapterActive ? 'التالي' : 'مقفل'; ?></span>
                         </div>
                     <?php endif; ?>
@@ -405,9 +405,9 @@ $conn->close();
                 <div>
                     <strong>
                         <?php if ($currentQuizDone): ?>
-                            ممتاز، انتهيت من اختبار هذا الدرس.
+                            ممتاز، انتهيت من اختبار هذا الشابتر.
                         <?php else: ?>
-                            التالي سيأخذك إلى اختبار هذا الدرس.
+                            التالي سيأخذك إلى اختبار هذا الشابتر.
                         <?php endif; ?>
                     </strong>
                     <p>التقدم الحالي: <?php echo $sequentialCompleted; ?> / <?php echo $total_chapters; ?> اختبارات مكتملة</p>
@@ -459,15 +459,15 @@ $conn->close();
         <section class="chapter-content-card">
             <div class="section-head">
                 <h2><?php echo htmlspecialchars($chapter['title']); ?></h2>
-                <span class="chapter-counter">الدرس <?php echo $chapter_number; ?> من <?php echo $total_chapters; ?></span>
+                <span class="chapter-counter">الشابتر <?php echo $chapter_number; ?> من <?php echo $total_chapters; ?></span>
             </div>
 
             <?php if ($isTeacher): ?>
                 <div class="inline-edit-box">
                     <form method="post" class="inline-edit-form">
                         <input type="hidden" name="action" value="save_title">
-                        <label>عنوان الدرس</label>
-                        <input type="text" name="title" value="<?php echo htmlspecialchars($chapter['title']); ?>" placeholder="عنوان الدرس">
+                        <label>عنوان الشابتر</label>
+                        <input type="text" name="title" value="<?php echo htmlspecialchars($chapter['title']); ?>" placeholder="عنوان الشابتر">
                         <button type="submit" class="save-btn">تم</button>
                     </form>
                 </div>
@@ -488,8 +488,8 @@ $conn->close();
                 <div class="inline-edit-box">
                     <form method="post" class="inline-edit-form">
                         <input type="hidden" name="action" value="save_content">
-                        <label>محتوى الدرس</label>
-                        <textarea name="content" rows="8" placeholder="اكتب محتوى الدرس هنا"><?php echo htmlspecialchars($chapter['content'] ?? ''); ?></textarea>
+                        <label>محتوى الشابتر</label>
+                        <textarea name="content" rows="8" placeholder="اكتب محتوى الشابتر هنا"><?php echo htmlspecialchars($chapter['content'] ?? ''); ?></textarea>
                         <button type="submit" class="save-btn">تم</button>
                     </form>
                 </div>
@@ -521,12 +521,12 @@ $conn->close();
     },
     initialMessages: [
       'هلا 👋',
-      'أنا مساعد هذا الدرس، اسألني عن الدرس أو عن المطلوب منك فيه.'
+      'أنا مساعد هذا الشابتر، اسألني عن الدرس أو عن المطلوب منك فيه.'
     ],
     i18n: {
       en: {
-        title: 'مساعد الدرس',
-        subtitle: 'اسأل عن هذا الدرس أو عن المطلوب منك فيه',
+        title: 'مساعد الشابتر',
+        subtitle: 'اسأل عن هذا الشابتر أو عن المطلوب منك فيه',
         footer: '',
         getStarted: 'ابدأ',
         inputPlaceholder: 'اكتب سؤالك هنا...'

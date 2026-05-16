@@ -1,0 +1,220 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,100..900&display=swap');
+@import url('https://cdn-uicons.flaticon.com/3.0.0/uicons-regular-rounded/css/uicons-regular-rounded.css');
+@import url('https://cdn-uicons.flaticon.com/3.0.0/uicons-solid-rounded/css/uicons-solid-rounded.css');
+@import url('https://cdn-uicons.flaticon.com/3.0.0/uicons-solid-straight/css/uicons-solid-straight.css');
+
+*{
+
+    box-sizing: border-box;
+     font-family: "Cairo", sans-serif;
+  font-optical-sizing: auto;
+}.home-side {
+  display: flex;
+  flex-direction: column;
+  width: 70px;
+  height: 95%;
+  position: fixed;
+  z-index: 100;
+  top: 2%;
+  /* left: 0.5%; */
+  right: 0;
+  background-color: #ffffff;
+  border-radius: 25px 0 0 25px ;
+  gap: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.163);
+
+  /* إضافة مساحات وحركة */
+  padding-top: 1%;
+  box-sizing: border-box;
+  transition: width 0.4s ease, align-items 0.4s ease, left 0.2s ease;
+}
+
+.home-side.sidebar-open {
+  right: 0.5%;
+    border-radius: 25px;
+    width: 15%;
+}
+
+
+.home-side.sidebar-open .open-sidebar-btn {
+  transform: rotate(-90deg); 
+}
+.search-wrapper {
+display: flex;
+width: 60%;
+height: 36px;
+justify-content: space-between;
+margin: 0 auto;
+align-items: center;
+}
+
+.search-input {
+  display: none;
+  transition: all 0.4s ease;
+}
+
+.search-btn {
+  border: none;
+  background-color: #e7e7e7;
+  color: #00000075;
+  border-radius: 10px;
+  font-size: 100%;
+  height: 100%;
+  width: 100%;
+  margin:auto;
+  transition: width 0.4s ease;
+}
+
+.home-side.sidebar-open .search-wrapper {
+  width: 90%; 
+  height: 40px;
+  margin: 0 auto;
+  justify-content: flex-start;
+  
+}
+
+.home-side.sidebar-open .search-input {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+  border: none;
+  background-color: #e7e7e7;
+  padding-left: 17%; 
+  padding-right: 10px;
+  box-sizing: border-box;
+  font-size: 90%;
+  transition: width 0.4s ease;
+}
+.home-side.sidebar-open .search-input:focus{
+    outline: solid 2px #52a3ff;
+}
+
+.home-side.sidebar-open .search-btn {
+  position: absolute;
+  right: 83%;
+  z-index: 1;
+  width: auto;
+  height: auto;
+  background-color: transparent;
+  color: #00000075;
+  transition: all 0.4s ease;
+  cursor: pointer;
+}
+
+.open-sidebar-btn,
+.head-btns,
+.user-iconn {
+
+    
+    height: fit-content;
+  width: fit-content;
+  border: none;
+  background-color: transparent;
+  border-radius: 10px;
+  font-size: 120%;
+  transition: all 0.6s ease; 
+  color: #145ca3;
+  cursor: pointer;
+}
+
+.home-side.sidebar-open .head-btns,
+.home-side.sidebar-open .open-sidebar-btn {
+  
+  transition: all 0.4s ease;
+}
+
+.user-iconn {
+    
+    border-radius: 50%;
+    height: 40px;
+    width: 40px;
+  position: relative;
+  transition: all 0.6s ease; 
+  background-color: #145ca3;
+  color: #ffffff;
+  
+}
+
+.side-p,
+.side-user-p{
+    opacity: 0;
+    max-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    transition: opacity 0.3s ease, max-width 0.4s ease;
+    width: fit-content;
+    color: #145ca3;
+}
+.side-p-img{
+opacity: 0;
+    max-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    transition: opacity 0.3s ease, max-width 0.4s ease;
+    width: 15%;
+    color: #145ca3;
+}
+
+.home-side.sidebar-open .side-p,
+.home-side.sidebar-open .side-user-p{
+    opacity: 1;
+    max-width: 150px;
+    display: block;
+    text-decoration: none;
+    color: #145ca3;
+    
+}
+.home-side.sidebar-open .side-p-img{
+    
+    opacity: 1;
+    max-width: 100%;
+    direction: ltr;
+    display: flex;
+    text-decoration: none;
+    color: #145ca3;
+    
+}
+
+
+.btns-wrapper{
+display: flex;
+justify-content: space-between;
+width: 35%;
+margin: 0;
+margin: 0 auto;
+align-items: center;
+transition: all 0.4s ease-out;
+
+
+}
+.icon-wrapper{
+display: flex;
+justify-content: space-between;
+width: 55%;
+align-items: center;
+margin: 0 auto;
+position: relative;
+top: 50vh;
+transition: all 0.4s ease-out;
+}
+.home-side.sidebar-open .btns-wrapper,
+.home-side.sidebar-open .icon-wrapper{
+justify-content: space-between;
+width: 80%;
+}
+.a-side{
+    width: 100%;
+    height: 5%;
+    
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.15s ease;
+}
+.home-side.sidebar-open .a-side:hover{
+    background-color: #f0f0f0;
+    transition: background-color 0.15s ease;
+
+}
